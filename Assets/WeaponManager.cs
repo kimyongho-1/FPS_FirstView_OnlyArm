@@ -10,8 +10,6 @@ public class WeaponManager : MonoBehaviour
         Instance = this;
     }
     public bool Availablity;
-    [SerializeField] bool Fire;
-    [SerializeField] bool Reload;
 
     [SerializeField] AnimationController AC;
     [SerializeField] string Fire1_ID;
@@ -21,14 +19,34 @@ public class WeaponManager : MonoBehaviour
 
     [SerializeField] Transform WeaponTransform;
 
+    [SerializeField] bool Fire;
     [SerializeField] int CurrentAmmo;
-    [SerializeField] int MaxAmmo;
 
 
     [SerializeField] float fireFraq;
     float FireCounter;
     RaycastHit FireRayCast;
     [SerializeField] float fireRange;
+
+    [Header("reload Variable")]
+    [SerializeField] bool Reload;
+    [SerializeField] int MaxAmmo;
+    [SerializeField] int TotalAmmo;
+    [SerializeField] AmmoType Type;
+    public enum AmmoType
+    { 
+        _5_56,
+        _7_62,
+        _9mm
+    }
+    [SerializeField] int _5_56;
+    [SerializeField] int _9mm; 
+    [SerializeField] int _7_62;
+    void SetTotalAmmo()
+    { 
+        
+    }
+
     private void Update()
     {
         Inputs();
@@ -46,7 +64,13 @@ public class WeaponManager : MonoBehaviour
     public void StartFire()
     {
         Fire = true;
-        AC.SetBool(Fire1_ID, Fire);
+        if (CurrentAmmo <= 1)
+        { AC.SetBool(Fire1_ID, Fire); }
+        else
+        {
+            AC.SetBool(Fire1_ID, Fire); 
+        }
+
         CurrentAmmo--;
         FireCounter = Time.time + fireFraq;
 
