@@ -2,18 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RayTargetInfo
-{
-    public RayTargetInfo(RaycastHit hit, Quaternion rot)
-    {
-        normal = hit.normal;
-        position = hit.point;
-        rotation = rot;
-    }
-    Vector3 normal; public Vector3 GetNormal { get { return normal; } }
-    Vector3 position; public Vector3 GetPosition { get { return position; } }
-    Quaternion rotation; public Quaternion GetRotation { get { return rotation; } }
-}
 public class IKhandling : MonoBehaviour
 {
     Animator anim;
@@ -21,17 +9,15 @@ public class IKhandling : MonoBehaviour
     public float leftFootWeight = 1;
     public float rightFootWeight = 1;
 
-    // RaycastHit 자체를 변수로 현재 바닥오브젝트를 참조하기엔
-    // RayCastHit변수에 너무많은 불필요한 변수등을 전부 참조하게되기에
-    // 필요한 정보만 기억하여 꺼내 쓰는, 커스텀RaycastTargetInfo클래스를 만들어사용
-    RayTargetInfo leftFeetGroundInfo;
-    RayTargetInfo rightFeetGroundInfo;
+    Vector3 leftFootIKpos, rightFootIKpos;
+    Quaternion leftFootIKrot, rightFootIKrot;
+    bool leftFootOnGround, rightFootOnGround;
     public Transform leftFootRayOrigin, rightFootRayOrigin;
     public Transform leftIdleOrigin, rightIdleOrigin;
     Transform leftFoot,rightFoot;
     public float animSpeed = 1f;
 
-
+    public float moveSpeed = 0.2f;
     public float ikWeight = 1;
     public Transform leftIKTarget;
     public Transform rightIKTarget;
@@ -62,72 +48,43 @@ public class IKhandling : MonoBehaviour
     {
         if (Physics.Raycast(leftFootRayOrigin.position+Vector3.up, -Vector3.up, out RaycastHit hit, 1f + LeftFootRayLen))
         {
-            leftFeetGroundInfo = new RayTargetInfo(hit,Quaternion.FromToRotation(transform.up, hit.normal) * transform.rotation);
+            leftFootOnGround = true;
+            leftFootIKpos = hit.point;
+            leftFootIKrot = Quaternion.FromToRotation(transform.up, hit.normal) * transform.rotation;
         }
         else 
         {
             // 바닥이 없다면? 
-            leftFeetGroundInfo = null;
+            leftFootOnGround = false;
         }
-
     }
     public void CheckRightFeetUnderGround()
     {
         if (Physics.Raycast(rightFootRayOrigin.position + Vector3.up, -Vector3.up, out RaycastHit hit, 1f + LeftFootRayLen))
         {
-            rightFeetGroundInfo = new RayTargetInfo(hit, Quaternion.FromToRotation(transform.up, hit.normal) * transform.rotation);
+            rightFootOnGround = true;
+            rightFootIKpos = hit.point;
+            rightFootIKrot = Quaternion.FromToRotation(transform.up, hit.normal) * transform.rotation;
         }
-        else 
+        else
         {
             // 바닥이 없다면? 
-            rightFeetGroundInfo = null;
+            rightFootOnGround = false;
         }
-
+    }
+    public void FeetsUpdate()
+    {
+        CheckLeftFeetUnderGround();
+        CheckRightFeetUnderGround();
     }
 
     public void InitializeIdle()
     {
-        leftFootWeight = rightFootWeight = 1;
-        if (anim.GetFloat("Forward") != 0 || anim.GetFloat("Side") != 0)
-        {
-            leftFeetGroundInfo = rightFeetGroundInfo = null;
-            return;
-        }
-        else if (leftFeetGroundInfo == null && rightFeetGroundInfo == null )
-        {
-            // 현재 바닥 정보 IDLE에 맞게 초기화
-            if (Physics.Raycast(leftFootRayOrigin.position + Vector3.up, -Vector3.up, out RaycastHit hit, 1f + LeftFootRayLen))
-            {
-                // 바닥오브젝트(경사면이 존재할 경우대비)과 수평을 이루도록 Y축회전 + Idle상태의 발 회전값(기본값)
-                leftFeetGroundInfo = new RayTargetInfo(hit, Quaternion.FromToRotation(transform.up, hit.normal) * transform.rotation);
-                //new RayTargetInfo(hit, Quaternion.FromToRotation(transform.up, hit.normal) * transform.rotation);
-            }
-            if (Physics.Raycast(rightFootRayOrigin.position + Vector3.up, -Vector3.up, out hit, 1f + LeftFootRayLen))
-            {
-                // 바닥오브젝트(경사면이 존재할 경우대비)과 수평을 이루도록 Y축회전 + Idle상태의 발 회전값(기본값)
-                rightFeetGroundInfo = new RayTargetInfo(hit, Quaternion.FromToRotation(transform.up, hit.normal) * transform.rotation);
-            }
-            return;
-        }
+        if (leftFootOnGround == true && leftFootWeight < 1 )
+        { CheckLeftFeetUnderGround(); leftFootWeight = 1;  }
+        if (rightFootOnGround == true && rightFootWeight < 1)
+        { CheckRightFeetUnderGround(); rightFootWeight = 1; }
         return;
-        if (anim.GetFloat("Forward") != 0 || anim.GetFloat("Side") != 0)
-        {
-            // 현재 바닥 정보 IDLE에 맞게 초기화
-            if (Physics.Raycast(leftIdleOrigin.position + Vector3.up, -Vector3.up, out RaycastHit hit, 1f + LeftFootRayLen))
-            {
-                // 바닥오브젝트(경사면이 존재할 경우대비)과 수평을 이루도록 Y축회전 + Idle상태의 발 회전값(기본값)
-                leftFeetGroundInfo = new RayTargetInfo(hit, Quaternion.FromToRotation(transform.up, hit.normal) * leftIdleOrigin.rotation);
-                //new RayTargetInfo(hit, Quaternion.FromToRotation(transform.up, hit.normal) * transform.rotation);
-            }
-            if (Physics.Raycast(rightIdleOrigin.position + Vector3.up, -Vector3.up, out hit, 1f + LeftFootRayLen))
-            {
-                // 바닥오브젝트(경사면이 존재할 경우대비)과 수평을 이루도록 Y축회전 + Idle상태의 발 회전값(기본값)
-                rightFeetGroundInfo = new RayTargetInfo(hit, Quaternion.FromToRotation(transform.up, hit.normal) * rightIdleOrigin.rotation);
-            }
-            leftFootWeight = rightFootWeight = 1;
-            return;
-        }
-
     }
   
     #endregion
@@ -139,18 +96,17 @@ public class IKhandling : MonoBehaviour
     private void Update()
     {
         #region DEBUG
-        if (leftFeetGroundInfo != null)
+        if (leftFootOnGround ==true)
         { 
-            leftFootIKpositionReuslt.position = leftFeetGroundInfo.GetPosition+Vector3.up*offsets;
+            leftFootIKpositionReuslt.position = leftFootIKpos+Vector3.up*offsets;
             Debug.DrawRay(leftFootRayOrigin.position + Vector3.up, -Vector3.up * (1f + LeftFootRayLen), Color.black, 0.1f);
         }
-        if (rightFeetGroundInfo != null)
+        if (rightFootOnGround == true)
         {
-            rightFootIKpositionReuslt.position = rightFeetGroundInfo.GetPosition + Vector3.up * offsets;
+            rightFootIKpositionReuslt.position = rightFootIKpos + Vector3.up * offsets;
             Debug.DrawRay(rightFootRayOrigin.position + Vector3.up, -Vector3.up * (1f + LeftFootRayLen), Color.black, 0.1f);
         }
         #endregion
-
         anim.speed = animSpeed;
         TestMove();
         void TestMove()
@@ -160,11 +116,12 @@ public class IKhandling : MonoBehaviour
             Vector3 movementDir = (transform.forward * forward + side * transform.right).normalized;
             float inputMagnitude = Mathf.Clamp01(Mathf.Abs(forward) + Mathf.Abs(side));
             rb.velocity = (movementDir * animSpeed * inputMagnitude);
-            rb.MovePosition(movementDir * inputMagnitude * Time.deltaTime * animSpeed + transform.position);
+            rb.MovePosition(movementDir * inputMagnitude * Time.deltaTime * moveSpeed + transform.position);
             anim.SetFloat("Forward", forward);
             anim.SetFloat("Side", side);
             if (forward == 0 && side == 0)
             {
+                return;
                 rb.velocity = Vector3.zero;
                 InitializeIdle();
                 
@@ -196,33 +153,27 @@ public class IKhandling : MonoBehaviour
         // anim.SetIKHintPosition(AvatarIKHint.LeftKnee, leftHint.position);
         // anim.SetIKHintPosition(AvatarIKHint.RightKnee, rightHint.position);
 
+        if (Physics.Raycast(leftFootRayOrigin.position + Vector3.up, -Vector3.up, out RaycastHit hit, 1f + LeftFootRayLen))
+        {
+            leftFootOnGround = true;
+            leftFootIKpos = hit.point;
+            leftFootIKrot = Quaternion.FromToRotation(transform.up, hit.normal) * transform.rotation;
+        }
 
-
-        if (leftFeetGroundInfo != null)
+        if (leftFootOnGround == true)
         {
             anim.SetIKRotationWeight(AvatarIKGoal.LeftFoot, leftFootWeight);
-            anim.SetIKRotation(AvatarIKGoal.LeftFoot, leftFeetGroundInfo.GetRotation);
+            anim.SetIKRotation(AvatarIKGoal.LeftFoot, leftFootIKrot);
             anim.SetIKPositionWeight(AvatarIKGoal.LeftFoot, leftFootWeight);
-            anim.SetIKPosition(AvatarIKGoal.LeftFoot, leftFeetGroundInfo.GetPosition + Vector3.up*offsets);
-        }
-        else 
-        {
-            anim.SetIKPositionWeight(AvatarIKGoal.LeftFoot, 0);
-            anim.SetIKRotationWeight(AvatarIKGoal.LeftFoot, 0);
+            anim.SetIKPosition(AvatarIKGoal.LeftFoot,leftFootIKpos + Vector3.up*offsets);
         }
 
-        
-        if (rightFeetGroundInfo != null)
+        if (rightFootOnGround == true)
         {
             anim.SetIKRotationWeight(AvatarIKGoal.RightFoot, rightFootWeight);
-            anim.SetIKRotation(AvatarIKGoal.RightFoot, rightFeetGroundInfo.GetRotation);
+            anim.SetIKRotation(AvatarIKGoal.RightFoot, rightFootIKrot);
             anim.SetIKPositionWeight(AvatarIKGoal.RightFoot, rightFootWeight);
-            anim.SetIKPosition(AvatarIKGoal.RightFoot, rightFeetGroundInfo.GetPosition + Vector3.up * offsets);
-        }
-        else 
-        {
-            anim.SetIKPositionWeight(AvatarIKGoal.RightFoot, 0);
-            anim.SetIKRotationWeight(AvatarIKGoal.RightFoot, 0);
+            anim.SetIKPosition(AvatarIKGoal.RightFoot, rightFootIKpos + Vector3.up * offsets);
         }
         
 
