@@ -471,6 +471,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 266572743}
+  - component: {fileID: 266572749}
   - component: {fileID: 266572748}
   - component: {fileID: 266572747}
   - component: {fileID: 266572746}
@@ -593,17 +594,33 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 266572742}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5590698a9956591438ee30601374373d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   bones: []
   positions: []
+  startDir: []
   bonesLength: []
   iterations: 5
   Target: {fileID: 2070815109}
   Pole: {fileID: 171573667}
+--- !u!114 &266572749
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 266572742}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 67a033d4c29631547891ae506b80b974, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bones: []
+  target: {fileID: 2070815109}
+  iterations: 5
 --- !u!1 &330585543
 GameObject:
   m_ObjectHideFlags: 0
@@ -2674,7 +2691,7 @@ Transform:
   m_GameObject: {fileID: 2070815105}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.31554222, y: -0.97, z: 6.6}
+  m_LocalPosition: {x: 0.31554222, y: -0.26, z: 10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2705,7 +2722,7 @@ Transform:
   m_GameObject: {fileID: 2139859419}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -1.759}
+  m_LocalPosition: {x: 0, y: 0.295, z: -1.759}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5123,6 +5140,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bones: []
   positions: []
+  startDir: []
   bonesLength: []
   iterations: 4
   Target: {fileID: 2139859420}
@@ -5475,7 +5493,7 @@ Rigidbody:
     m_Bits: 0
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 1
   m_Constraints: 112

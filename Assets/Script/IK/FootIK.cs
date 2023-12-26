@@ -15,7 +15,7 @@ public class FootIK : MonoBehaviour
     /// 렌더링직전, foot이 위치해야할 월드상 위치배열
     /// </summary>
     public Vector3[] positions;
-    Vector3[] startDir;
+    public Vector3[] startDir;
     Quaternion[] startRotationBone;
     Quaternion startRotationTarget;
     Quaternion startRotationRoot;
@@ -80,8 +80,9 @@ public class FootIK : MonoBehaviour
         for (int i = 0; i < positions.Length; i++)
         { positions[i] = bones[i].position; }
 
-        var RootRot = (bones[0].parent != null) ? bones[0].parent.rotation : Quaternion.identity;
-        var RootRotDiff = RootRot * Quaternion.Inverse(startRotationRoot);
+        //var RootRot = (bones[0].parent != null) ? bones[0].parent.rotation : Quaternion.identity;
+        //var RootRotDiff = RootRot * Quaternion.Inverse(startRotationRoot);
+
         // 골반에서 최종 위치까지의 거리가 하체의 총길이보다 크다면
         // 타겟 방향으로 뻗어나가게만 위치 설정후 끝내기
         if ((Target.position - bones[0].position).sqrMagnitude >= totalBonesLength * totalBonesLength)
@@ -128,8 +129,8 @@ public class FootIK : MonoBehaviour
                     }
 
                     // 발에서 무릎으로 향하는 역방향으로 우선 위치시키기
-                    positions[i] = positions[i+1] +
-                        (positions[i] - positions[i+1]).normalized * bonesLength[i];
+                    positions[i] = positions[i+1] +  // 시작위치는 자식뼈 위치에서
+                        (positions[i] - positions[i+1]).normalized * bonesLength[i]; // 자식뼈에서 자신으로 향하는 방향벡터 * 뼈길이
                 }
 
                 // 순방향 계산, 역순방향에서 못한 신체구조상의 위치계산 (0번쨰 인덱스 뼈골반은 움직여선 안되기에 생략)
@@ -181,15 +182,24 @@ public class FootIK : MonoBehaviour
             //발
             if (i == positions.Length - 1)
             {
-                bones[i].rotation = Target.rotation
-                    * Quaternion.Inverse(startRotationTarget)
-                    * startRotationBone[i];
+                // 발의 회전 같은 경우, ik타겟의 회전과 동일하게 진행하는데
+                // 먼저 Play실행시 초기화한 타겟의 기본회전값 startRotationTarget변수만큼
+                // 현재 타겟 회전을 뺴준다 = 순수 회전량이 나오게되는데
+                // 다시 한번더 뼈대 자신의 기본 회전값을 곱해준다.
+                bones[i].rotation =
+                    Target.rotation // 현재 타겟의 회전량에서
+                    * Quaternion.Inverse(startRotationTarget) // 타겟의 시작회전량 뺴기 (순수 회전량을 구하기위해)
+                    * startRotationBone[i]; // 그리고 캐릭터 뼈대의 초기 회전량 다시 더하기 (초기 자세를 기준으로 회전시키기 위해)
             }
             else
             {
+                // startDir은 시작시 초기화한 기본 방향벡터이며
+                // 기본방향에서 , 부모에서 자식으로 향하는 현재의 뼈대 방향벡터로 향하는 회전을 구해
+                // 뼈대 자신의 초기 시작회전값만큼 시작하도록 다시 곱한값을 회전으로 입력
                 bones[i].rotation =
-                    Quaternion.FromToRotation(startDir[i], positions[i + 1]
-                    - positions[i]) * startRotationBone[i];
+                    Quaternion.FromToRotation(startDir[i],  // 시작방향벡터에서 (골반에서 무릎 또는 무릎에서 발로 향하는 방향벡터)
+                    positions[i + 1] - positions[i])  // 현재 방향벡터만큼 회전시의 회전량 구하기 (POSITION[i+1]에서 i가 증가할수록 자식뼈대 )
+                    * startRotationBone[i]; // 그리고 캐릭터 뼈대의 초기 회전량 다시 더하기 (초기 자세를 기준으로 회전시키기 위해)
             }
             bones[i].position = positions[i];
         }
