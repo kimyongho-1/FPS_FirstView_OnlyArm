@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class FARBIK : MonoBehaviour
 {
@@ -8,9 +9,13 @@ public class FARBIK : MonoBehaviour
     public Transform[] Bones;
     public Vector3[] Positions;
     public float[] BonesLength;
-    int ChainLen = 3; // 관절사이의 간격 갯수 (4개의 본이라면 3개의 연결선)
+    int ChainLen = 2; // 관절사이의 간격 갯수 (4개의 본이라면 3개의 연결선)
     float totalLen;
     public int Iterations=5;
+    private void Awake()
+    {
+        Init();
+    }
     void Init()
     {
         Bones = new Transform[ChainLen + 1];
@@ -21,8 +26,8 @@ public class FARBIK : MonoBehaviour
         for (int i = Bones.Length-1; i >= 0; i--)
         {
             Bones[i] = current;
-            if (i == Bones.Length - 1)
-            { }
+            // 최고 LeafBone은 무시
+            if (i == Bones.Length - 1){ }
             else
             {
                 BonesLength[i] = (Bones[i + 1].position - current.position).magnitude;
@@ -61,6 +66,8 @@ public class FARBIK : MonoBehaviour
                 Positions[i] = Positions[i - 1] + dir * BonesLength[i - 1];
             }
         }
+        // 본의 최상위 잎본, 시작뼈대에서 타겟까지의 거리가 모든 뼈간격길이보다 작다면
+        // 즉 꼬리 본이 타겟의 위치에 있을수 있는 가능한 거리
         else 
         {
             for (int iteration = 0; iteration < Iterations; iteration++)
@@ -81,7 +88,8 @@ public class FARBIK : MonoBehaviour
                         // 제일 꼬리가 아닌 이외 파트는
                         // 자신의 자식에서 자신으로 향하는 방향벡터 곱하기 자신의 본 길이
                         // 한 새 위치값 할당
-                        Positions[i] = (Positions[i] - Positions[i + 1]).normalized * BonesLength[i];
+                        Positions[i] = Positions[i+1] +
+                            (Positions[i] - Positions[i + 1]).normalized * BonesLength[i];
                     }
                 }
                 #endregion
@@ -95,6 +103,7 @@ public class FARBIK : MonoBehaviour
                  
                 }
                 #endregion
+
                 // 제일 촉수부분이 타겟이랑 너무 가까우면 강제 종료
                 if ((Positions[Positions.Length - 1] - Target.position).sqrMagnitude
                     < 0.01f * 0.01f)
@@ -109,10 +118,19 @@ public class FARBIK : MonoBehaviour
         }
     }
 
-    private void S()
+    private void OnDrawGizmos()
     {
-       
+        var current = this.transform;
+        for (int i = 0; i < ChainLen && current != null && current.parent != null; i++) 
+        {
+            var scale = Vector3.Distance(current.position, current.parent.position) * 0.1f;
+            UnityEditor.Handles.matrix = Matrix4x4.TRS(current.position,
+                Quaternion.FromToRotation(Vector3.up, current.parent.position-current.position)
+                , new Vector3(scale, Vector3.Distance(current.parent.position, current.position),scale));
+            UnityEditor.Handles.color = Color.green;
+            UnityEditor.Handles.DrawWireCube(Vector3.up *0.5f, Vector3.one);
+            current = current.parent;
+        }
     }
- 
 
 }
