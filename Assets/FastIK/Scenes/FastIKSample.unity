@@ -469,7 +469,7 @@ Light:
   m_BounceIntensity: 1
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
-  m_BoundingSphereOverride: {x: 9.1835e-41, y: NaN, z: NaN, w: NaN}
+  m_BoundingSphereOverride: {x: -1, y: 10, z: 9, w: -12}
   m_UseBoundingSphereOverride: 0
   m_UseViewFrustumForShadowCasterCull: 1
   m_ShadowRadius: 0
@@ -1684,7 +1684,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!65 &569709845
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2123,7 +2123,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &879213815
 Transform:
   m_ObjectHideFlags: 0
@@ -2915,7 +2915,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1236799112
 Transform:
   m_ObjectHideFlags: 0
@@ -2948,14 +2948,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed071c0bc8e2cc44da0e83dbcb5bb45e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bones:
-  - {fileID: 1986949139}
-  - {fileID: 224039712}
-  - {fileID: 145036174}
-  - {fileID: 1215898811}
-  - {fileID: 1029686325}
-  solverIterations: 6
-  targetPosition: {fileID: 569709848}
 --- !u!1 &1304514151
 GameObject:
   m_ObjectHideFlags: 0
@@ -3184,7 +3176,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1652792637
 Transform:
   m_ObjectHideFlags: 0
@@ -3662,7 +3654,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1881460167
 Transform:
   m_ObjectHideFlags: 0
@@ -4975,7 +4967,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!137 &731249385282976637
 SkinnedMeshRenderer:
   m_ObjectHideFlags: 0

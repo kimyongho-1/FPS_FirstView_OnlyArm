@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class FootIK : MonoBehaviour
 {
+    //public IKhandling handle;
     #region Variable
 
     /// <summary>
@@ -34,7 +35,7 @@ public class FootIK : MonoBehaviour
     public Transform Target;
     public Transform Pole;
     float totalBonesLength = 0;// 각 뼈사이의 총 길이합 (골바에서 발까지의 총 신체길이)
-
+    public float leftWeight=1f;
     #endregion
 
     private void Awake()
@@ -63,7 +64,7 @@ public class FootIK : MonoBehaviour
         }
 
     }
-    
+
     /// <summary>
     /// Update에서 뼈의 회전+위치등을 적용시
     /// 애니메이션 상태가 업데이트 될떄마다, 
@@ -71,10 +72,14 @@ public class FootIK : MonoBehaviour
     /// 따라서 LateUpdate에 작성 및 실행시 정상작동 확인
     /// Update-OnAnimatorIK-LateUpdate 순서
     /// </summary>
-    private void LateUpdate()
+    public void DoHandIK()
     {
         // to do : weight가 0이어도 예외
         if (Target == null) { return; }
+        if (leftWeight <= 0) { return; }
+        // if (Physics.Raycast(rayorigin.position, Vector3.up * -0.5f, out RaycastHit hit, 1f)) {  Target.position = hit.point; }
+
+
 
         // 뼈를 곧바로 이동이 아닌, 보정하는 방식으로 계산
         for (int i = 0; i < positions.Length; i++)
@@ -138,8 +143,8 @@ public class FootIK : MonoBehaviour
                 {
                     // 자신의 부모위치에서, 부모에서 나로 향하는 방향벡터 * 뼈 길이
                     // 를 취한 계산이 현재 뼈가 위치해야할 위치벡터
-                    positions[i] = positions[i-1] +
-                        (positions[i]- positions[i - 1]).normalized * bonesLength[i-1];
+                    positions[i] = positions[i-1] + // 부모위치에서
+                        (positions[i]- positions[i - 1]).normalized * bonesLength[i-1]; // 부모에서자신으로 향하는 방향
                 }
 
                 // iterations만큼 계산하지만, 이미 위치가 정확할시
@@ -186,10 +191,13 @@ public class FootIK : MonoBehaviour
                 // 먼저 Play실행시 초기화한 타겟의 기본회전값 startRotationTarget변수만큼
                 // 현재 타겟 회전을 뺴준다 = 순수 회전량이 나오게되는데
                 // 다시 한번더 뼈대 자신의 기본 회전값을 곱해준다.
-                bones[i].rotation =
+                bones[i].rotation = Target.rotation;
+                bones[i].position = Target.position;
+                /*/
                     Target.rotation // 현재 타겟의 회전량에서
                     * Quaternion.Inverse(startRotationTarget) // 타겟의 시작회전량 뺴기 (순수 회전량을 구하기위해)
                     * startRotationBone[i]; // 그리고 캐릭터 뼈대의 초기 회전량 다시 더하기 (초기 자세를 기준으로 회전시키기 위해)
+                /*/
             }
             else
             {
@@ -200,12 +208,16 @@ public class FootIK : MonoBehaviour
                     Quaternion.FromToRotation(startDir[i],  // 시작방향벡터에서 (골반에서 무릎 또는 무릎에서 발로 향하는 방향벡터)
                     positions[i + 1] - positions[i])  // 현재 방향벡터만큼 회전시의 회전량 구하기 (POSITION[i+1]에서 i가 증가할수록 자식뼈대 )
                     * startRotationBone[i]; // 그리고 캐릭터 뼈대의 초기 회전량 다시 더하기 (초기 자세를 기준으로 회전시키기 위해)
+                bones[i].position = positions[i];
             }
-            bones[i].position = positions[i];
+
+            
+            //bones[i].position= Vector3.Lerp(bones[i].position, positions[i], handle.GetLeftFootWeight);
         }
 
     }
 
+    //public Transform rayorigin;
     private void OnDrawGizmos()
     {
         var current = this.transform;
@@ -219,5 +231,6 @@ public class FootIK : MonoBehaviour
             UnityEditor.Handles.DrawWireCube(Vector3.up * 0.5f, Vector3.one);
             current = current.parent;
         }
+      
     }
 }
