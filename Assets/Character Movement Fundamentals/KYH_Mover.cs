@@ -85,6 +85,7 @@ public class KYH_Mover : MonoBehaviour
         pitch -= input.GetMouseY() * 50f * Time.deltaTime;
         pitch = Mathf.Clamp(pitch ,-80f,80f);
         CameraTr.localRotation = Quaternion.Euler(pitch, 0, 0);
+        
         yaw += input.GetMouseX() * 50f * Time.deltaTime;   
         transform.rotation = Quaternion.Euler(0, yaw, 0);
 

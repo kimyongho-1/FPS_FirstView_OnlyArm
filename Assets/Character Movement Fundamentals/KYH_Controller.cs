@@ -92,6 +92,7 @@ public class KYH_Controller : MonoBehaviour
         Vector3 _direction = Vector3.zero;
         float side = input.GetHorizontalMovementInput();
         float forward = input.GetVerticalMovementInput();
+        
         _direction += tr.right * side;
         _direction += tr.forward *forward;
         anim.SetFloat("Forward", forward); anim.SetFloat("Side", side);

@@ -89,6 +89,7 @@ public class PlayerMovement : MonoBehaviour
     public float nerfVelocity = 1f;
     void Gravity()
     {
+
         // 땅에 있을시, 일정한 중력만 고정
         if (isGrounded)
         {
@@ -118,8 +119,7 @@ public class PlayerMovement : MonoBehaviour
             // 그외 이동은 해당 각도방향으로 이동방향을 수정
             else
             {
-                moveDir = Vector3.ProjectOnPlane
-               ((horizontalInput * transform.right + verticalInput * transform.forward).normalized, hit.normal);
+                moveDir = Vector3.ProjectOnPlane ((horizontalInput * transform.right + verticalInput * transform.forward).normalized, hit.normal);
                 cap.height = 1.4f;
             }
             transform.position = new Vector3(transform.position.x, hit.point.y, transform.position.z);

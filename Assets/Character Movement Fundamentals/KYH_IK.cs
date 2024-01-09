@@ -8,6 +8,8 @@ public class KYH_IK : MonoBehaviour
     public KYH_Mover mover;
     Animator anim;
 
+    public Transform LookTarget;
+    [Range(0,1f)]public float bodyWeight,headWeight, clampAmount;
     #region HAND
     public Transform LHtarget, RHtarget, LElbow, RElbow;
     #endregion
@@ -38,8 +40,19 @@ public class KYH_IK : MonoBehaviour
         HandIK();
         FootIK();
     }
+    public float onlyBodyWeight = 1f;
+    public Transform GunPivots;
+    void LookIK() 
+    {
+        if (LookTarget == null) { return; }
+        // ÀÏ¹Ý LookAt
+        anim.SetLookAtWeight(1f, bodyWeight,headWeight,0f,clampAmount);
+        anim.SetLookAtPosition(LookTarget.position);
 
-    void LookIK() { }
+        // ¸öÃ¼ LookAt
+        anim.SetLookAtWeight(1f, onlyBodyWeight, 0, 0f, 0f);
+        anim.SetLookAtPosition(GunPivots.position);
+    }
     void HandIK()
     {
         anim.SetIKHintPositionWeight(AvatarIKHint.LeftElbow, 1.0f);
