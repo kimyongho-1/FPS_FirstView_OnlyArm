@@ -25437,6 +25437,7 @@ GameObject:
   - component: {fileID: 1544298781}
   - component: {fileID: 1544298782}
   - component: {fileID: 1544298783}
+  - component: {fileID: 1544298784}
   m_Layer: 0
   m_Name: Practice_Player
   m_TagString: Untagged
@@ -25453,7 +25454,7 @@ Transform:
   m_GameObject: {fileID: 1544298779}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 14.43, y: 0, z: 10.67}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -25472,6 +25473,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e92d14bbc3873746ae0a6647f875ec8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  <ColliderUtill>k__BackingField:
+    <DefaultColliderData>k__BackingField:
+      <Height>k__BackingField: 1.6
+      <CenterY>k__BackingField: 0.8
+      <Radius>k__BackingField: 0.5
+    <SlopeData>k__BackingField:
+      <StepHeightRatio>k__BackingField: 0.13
+      <rayDist>k__BackingField: 1
+      <stepReachForce>k__BackingField: 25
+  <playerLayers>k__BackingField:
+    <GroundLayer>k__BackingField:
+      serializedVersion: 2
+      m_Bits: 4096
+  LeftShift: 0
   movementInput: {x: 0, y: 0}
   directionInput: {x: 0, y: 0}
 --- !u!54 &1544298782
@@ -25520,10 +25535,26 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.35
-  m_Height: 1.6
+  m_Radius: 0.5
+  m_Height: 1.3920001
   m_Direction: 1
-  m_Center: {x: 0, y: 0.8, z: 0}
+  m_Center: {x: 0, y: 0.904, z: 0}
+--- !u!114 &1544298784
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1544298779}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cb886731d40409c4d8e38f37defb54b6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  slopeSpeed: 1
+  moveSpeed: 5
+  mouseSensiX: 5
+  mouseSensiY: 5
 --- !u!1 &1545232386
 GameObject:
   m_ObjectHideFlags: 0
