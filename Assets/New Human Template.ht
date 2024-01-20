@@ -1,0 +1,62 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1105 &110500000
+HumanTemplate:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: New Human Template
+  m_BoneTemplate:
+    Chest: CC_Base_Spine01
+    Head: CC_Base_Head
+    Hips: CC_Base_Hip
+    Left Index Distal: CC_BaseIndex3.L
+    Left Index Intermediate: CC_BaseIndex2.L
+    Left Index Proximal: CC_BaseIndex1.L
+    Left Little Distal: CC_BasePinky3.L
+    Left Little Intermediate: CC_BasePinky2.L
+    Left Little Proximal: CC_BasePinky1.L
+    Left Middle Distal: CC_BaseMid3.L
+    Left Middle Intermediate: CC_BaseMid2.L
+    Left Middle Proximal: CC_BaseMid1.L
+    Left Ring Distal: CC_BaseRing3.L
+    Left Ring Intermediate: CC_BaseRing2.L
+    Left Ring Proximal: CC_BaseRing1.L
+    Left Thumb Distal: CC_BaseThumb3.L
+    Left Thumb Intermediate: CC_BaseThumb2.L
+    Left Thumb Proximal: CC_BaseThumb1.L
+    LeftFoot: CC_BaseFoot.L
+    LeftHand: CC_BaseHand.L
+    LeftLowerArm: CC_BaseForearm.L
+    LeftLowerLeg: CC_BaseCalf.L
+    LeftShoulder: CC_BaseClavicle.L
+    LeftToes: CC_BaseToeBase.L
+    LeftUpperArm: CC_BaseUpperarm.L
+    LeftUpperLeg: CC_BaseThigh.L
+    Neck: CC_Base_NeckTwist01
+    Right Index Distal: CC_BaseIndex3.R
+    Right Index Intermediate: CC_BaseIndex2.R
+    Right Index Proximal: CC_BaseIndex1.R
+    Right Little Distal: CC_BasePinky3.R
+    Right Little Intermediate: CC_BasePinky2.R
+    Right Little Proximal: CC_BasePinky1.R
+    Right Middle Distal: CC_BaseMid3.R
+    Right Middle Intermediate: CC_BaseMid2.R
+    Right Middle Proximal: CC_BaseMid1.R
+    Right Ring Distal: CC_BaseRing3.R
+    Right Ring Intermediate: CC_BaseRing2.R
+    Right Ring Proximal: CC_BaseRing1.R
+    Right Thumb Distal: CC_BaseThumb3.R
+    Right Thumb Intermediate: CC_BaseThumb2.R
+    Right Thumb Proximal: CC_BaseThumb1.R
+    RightFoot: CC_BaseFoot.R
+    RightHand: CC_BaseHand.R
+    RightLowerArm: CC_BaseForearm.R
+    RightLowerLeg: CC_BaseCalf.R
+    RightShoulder: CC_BaseClavicle.R
+    RightToes: CC_BaseToeBase.R
+    RightUpperArm: CC_BaseUpperarm.R
+    RightUpperLeg: CC_BaseThigh.R
+    Spine: CC_Base_Waist
+    UpperChest: CC_Base_Spine02

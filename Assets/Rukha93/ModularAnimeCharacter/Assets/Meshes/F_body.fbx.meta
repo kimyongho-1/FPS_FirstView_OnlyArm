@@ -86,6 +86,9 @@ ModelImporter:
     optimizeGameObjects: 0
     removeConstantScaleCurves: 1
     motionNodeName: 
+    rigImportErrors: "Copied Avatar Rig Configuration mis-match. Transform hierarchy
+      does not match:\n\tTransform 'root' for human bone 'Hips' not found\n"
+    rigImportWarnings: 
     animationImportErrors: 
     animationImportWarnings: 
     animationRetargetingWarnings: 
@@ -108,6 +111,7 @@ ModelImporter:
     addColliders: 0
     useSRGBMaterialColor: 1
     sortHierarchyByName: 1
+    importPhysicalCameras: 1
     importVisibility: 1
     importBlendShapes: 1
     importCameras: 1
@@ -824,7 +828,7 @@ ModelImporter:
     - name: CC_BasePinky3.L
       parentName: CC_BasePinky2.L
       position: {x: -0.0000000070035457, y: 0.013010089, z: -0.0000000023841857}
-      rotation: {x: 0.0018779056, y: -0.00011964341, z: 0.026909018, w: 0.9996361}
+      rotation: {x: 0.0018779057, y: -0.00011964341, z: 0.02690902, w: 0.9996361}
       scale: {x: 1.0000002, y: 1.0000001, z: 0.9999998}
     - name: CC_BasePinky3.L_end
       parentName: CC_BasePinky3.L
@@ -1061,6 +1065,11 @@ ModelImporter:
       position: {x: -0, y: -0.0006303016, z: -0.0016106805}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
+    - name: F_body_legs_knee
+      parentName: F_body(Clone)
+      position: {x: -0, y: -0.0006303016, z: -0.0016106805}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
     - name: F_body_legs_lower
       parentName: F_body(Clone)
       position: {x: -0, y: -0.0006303016, z: -0.0016106805}
@@ -1077,6 +1086,11 @@ ModelImporter:
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: F_body_torso
+      parentName: F_body(Clone)
+      position: {x: -0, y: -0.0006303016, z: -0.0016106805}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: F_body_torso.001
       parentName: F_body(Clone)
       position: {x: -0, y: -0.0006303016, z: -0.0016106805}
       rotation: {x: 0, y: -0, z: -0, w: 1}
