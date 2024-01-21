@@ -13,12 +13,16 @@ public class IdleState : OnGroundState
 
     public override void Exit()
     {
+        base.Exit();
     }
     public override void HandleInput()
     {
         base.HandleInput();
         StateMachine.Player.SettingData.Run = Input.GetKey(KeyCode.LeftShift);
-        StateMachine.Player.SettingData.Crouch = Input.GetKey(KeyCode.C);
+        if(Input.GetKeyDown(KeyCode.C))
+        {
+            StateMachine.Player.SettingData.Crouch = !StateMachine.Player.SettingData.Crouch;
+        }
     }
     public override void FixedUpdate()
     {
@@ -32,9 +36,12 @@ public class IdleState : OnGroundState
 
         if (StateMachine.Player.SettingData.Run)
         {
+            StateMachine.Player.Anim.CrossFadeInFixedTime("Run", StateMachine.Player.TSspeed);
             StateMachine.SwitchState(StateMachine.RunState);
             return;
         }
+
+        StateMachine.Player.Anim.CrossFadeInFixedTime("WalkEnter", StateMachine.Player.TSspeed);
         StateMachine.SwitchState(StateMachine.WalkState);
     }
 }

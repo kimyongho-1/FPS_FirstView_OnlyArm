@@ -13,6 +13,7 @@ public class RunState : OnGroundState
 
     public override void Exit()
     {
+        base.Exit();
     }
 
     public override void FixedUpdate()

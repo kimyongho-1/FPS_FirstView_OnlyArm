@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class BasePlayer : MonoBehaviour
 {
+    public float TSspeed = 0.5f;
     PlayerStateMachine StateMachine { get; set; }
     public Rigidbody RB { get; private set; }
     [field:SerializeField]public Animator Anim { get; private set; }

@@ -8,7 +8,7 @@ public class FixedPlayerSettingData
     Animator anim;
     int RunID, CrouchID;
     public FixedPlayerSettingData() { }
-    public void Init(Animator A) 
+    public void Init(Animator A)
     {
         RunID = Animator.StringToHash("Run");
         CrouchID = Animator.StringToHash("Crouch");
