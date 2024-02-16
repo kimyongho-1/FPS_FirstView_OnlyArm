@@ -13653,7 +13653,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &959145324
 Transform:
   m_ObjectHideFlags: 0
@@ -16588,7 +16588,7 @@ Transform:
   m_GameObject: {fileID: 1180346879}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 2}
+  m_LocalPosition: {x: 0, y: -1, z: 5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -18071,7 +18071,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1279388524}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -25087,6 +25087,7 @@ Transform:
   m_Children:
   - {fileID: 1739022173}
   - {fileID: 959145324}
+  - {fileID: 1868509927}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1665295176
@@ -25739,8 +25740,8 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1842354787437202823}
-  - {fileID: 1279388525}
   - {fileID: 977157988}
+  - {fileID: 1279388525}
   m_Father: {fileID: 1665295175}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1744435312
@@ -27728,12 +27729,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1868509923}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.4, z: -3}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 2, z: -5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1665295175}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1868509928
 MonoBehaviour:
@@ -56980,10 +56981,10 @@ Animator:
   m_GameObject: {fileID: 1358551372078716733}
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: 6e4d47778c956cc4c9d7fdffcf7e97be, type: 3}
-  m_Controller: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 148fb539440ef9a4dbbe069d729d2b0d, type: 2}
   m_CullingMode: 1
   m_UpdateMode: 0
-  m_ApplyRootMotion: 1
+  m_ApplyRootMotion: 0
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
   m_WarningMessage: 
@@ -57009,6 +57010,14 @@ MonoBehaviour:
   arrowSize: 0.1
   drawTarget: 1
   targetSize: 0.1
+  myInput: {fileID: 5724487711584327679}
+  clampweight: 0
+  body: 0.5
+  head: 0.5
+  upperBody: {fileID: 4563967268266664919}
+  lowerBody: {fileID: 5456036403871784818}
+  rotationDelay: 0.2
+  Tr: {fileID: 1739022173}
 --- !u!114 &5724487711584327679
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -57024,7 +57033,7 @@ MonoBehaviour:
   YawRotator: {fileID: 1279388525}
   PitchRotator: {fileID: 213900986}
   LookTarget: {fileID: 1180346880}
-  power: 25
+  power: 90
   yawAmount: 0
 --- !u!4 &5727836837459934342
 Transform:
@@ -70345,7 +70354,6 @@ GameObject:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
-  - {fileID: 1868509927}
   - {fileID: 1913594983}
   - {fileID: 1844809673}
   - {fileID: 410087041}

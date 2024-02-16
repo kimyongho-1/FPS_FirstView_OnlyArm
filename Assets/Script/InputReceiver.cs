@@ -20,6 +20,9 @@ public class InputReceiver : MonoBehaviour
         if (Input.GetKey(KeyCode.D))
         { yawAmount += Time.deltaTime * power; }
 
+        if (yawAmount < 0f) { yawAmount += 360f; }
+        if (yawAmount > 360f) { yawAmount = yawAmount % 360f; }
+
         YawRotator.localRotation = Quaternion.Euler(Vector3.up * yawAmount );
         
     }
