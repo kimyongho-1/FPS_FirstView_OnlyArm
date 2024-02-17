@@ -38,12 +38,30 @@ public class SpineRotate : MonoBehaviour
     [Range(0, 1f)] public float clampweight;
     [Range(0, 1f)] public float body;
     [Range(0, 1f)] public float head;
-
-
+    public Transform LeftHandTarget, RightHandTarget, LeftElbow, RightElbow;
+    public Transform WeaponPivot;
+    [Range(0, 1f)] public float weights;
     private void OnAnimatorIK(int layerIndex)
     {
         anim.SetLookAtWeight(1, body, head, 0, clampweight);
         anim.SetLookAtPosition(myInput.LookTarget.position);
+
+        GetAnim.SetIKPositionWeight(AvatarIKGoal.RightHand, 1);
+        GetAnim.SetIKPosition(AvatarIKGoal.RightHand, RightHandTarget.position);
+        GetAnim.SetIKHintPositionWeight(AvatarIKHint.RightElbow, 1);
+        GetAnim.SetIKHintPosition(AvatarIKHint.RightElbow, RightElbow.position);
+
+        GetAnim.SetIKRotationWeight(AvatarIKGoal.RightHand, 1);
+        GetAnim.SetIKRotation(AvatarIKGoal.RightHand, RightHandTarget.rotation);
+
+
+        GetAnim.SetIKPositionWeight(AvatarIKGoal.LeftHand, weights);
+        GetAnim.SetIKPosition(AvatarIKGoal.LeftHand, LeftHandTarget.position);
+        GetAnim.SetIKHintPositionWeight(AvatarIKHint.LeftElbow, weights);
+        GetAnim.SetIKHintPosition(AvatarIKHint.LeftElbow, LeftElbow.position);
+
+        GetAnim.SetIKRotationWeight(AvatarIKGoal.LeftHand, weights);
+        GetAnim.SetIKRotation(AvatarIKGoal.LeftHand, LeftHandTarget.rotation);
 
     }
 
@@ -53,9 +71,17 @@ public class SpineRotate : MonoBehaviour
     public float rotationDelay = 0.5f; // 하체가 따라오는데 걸리는 시간
 
     public Transform Tr;
+    public float offset = 90f;
     private void Update()
     {
+        Vector3 dir = myInput.LookTarget.position - WeaponPivot.position;
+        Quaternion lookRotation = Quaternion.LookRotation(dir ); 
+        Quaternion offsetRotation = Quaternion.Euler(0, offset, 0);
 
+        // lookRotation에 offsetRotation을 곱합니다.
+        lookRotation = lookRotation * offsetRotation;
+        WeaponPivot.rotation = Quaternion.Slerp(WeaponPivot.rotation, lookRotation, Time.deltaTime / 0.1f);
+        
         //Debug.Log(upperBody.rotation.eulerAngles.y);
         Vector3 move = Vector3.zero;
         if (Input.GetKey(KeyCode.W))

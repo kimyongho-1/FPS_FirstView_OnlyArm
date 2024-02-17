@@ -4,15 +4,22 @@ using UnityEngine;
 
 public class HandIK : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    public Transform LeftHandTarget, RightHandTarget;
+    Animator armAnim;
+    private void Awake()
     {
-        
+        armAnim = GetComponent<Animator>();
     }
-
-    // Update is called once per frame
-    void Update()
+    private void OnAnimatorIK(int layerIndex)
     {
-        
+        armAnim.SetIKPositionWeight(AvatarIKGoal.LeftHand, 1f);
+        armAnim.SetIKPosition(AvatarIKGoal.LeftHand, LeftHandTarget.position);
+        armAnim.SetIKRotationWeight(AvatarIKGoal.LeftHand, 1f);
+        armAnim.SetIKRotation(AvatarIKGoal.LeftHand, LeftHandTarget.rotation);
+
+        armAnim.SetIKPositionWeight(AvatarIKGoal.RightHand, 1f);
+        armAnim.SetIKPosition(AvatarIKGoal.RightHand,RightHandTarget.position);
+        armAnim.SetIKRotationWeight(AvatarIKGoal.RightHand, 1f);
+        armAnim.SetIKRotation(AvatarIKGoal.RightHand, RightHandTarget.rotation);
     }
 }
