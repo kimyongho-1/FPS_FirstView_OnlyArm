@@ -6,10 +6,8 @@ public class InputReceiver : MonoBehaviour
 {
     public Transform YawRotator, PitchRotator, LookTarget;
     public float power;
-    public float yawAmount;
-    private void Awake()
-    {
-    }
+    public float yawAmount,pitchAmount;
+    public Vector2 pitchAngle;
     private void Update()
     {
         if (Input.GetKey(KeyCode.A))
@@ -20,9 +18,19 @@ public class InputReceiver : MonoBehaviour
         if (Input.GetKey(KeyCode.D))
         { yawAmount += Time.deltaTime * power; }
 
-        if (yawAmount < 0f) { yawAmount += 360f; }
-        if (yawAmount > 360f) { yawAmount = yawAmount % 360f; }
+        if (Input.GetKey(KeyCode.W))
+        {
+            pitchAmount -= Time.deltaTime * power;
+        }
+        if (Input.GetKey(KeyCode.S))
+        {
+            pitchAmount += Time.deltaTime * power;
+        }
 
+        yawAmount = Mathf.Repeat(yawAmount, 360f);
+        pitchAmount = Mathf.Clamp(pitchAmount, pitchAngle.x, pitchAngle.y);
+
+        PitchRotator.localRotation = Quaternion.Euler(Vector3.right * pitchAmount);
         YawRotator.localRotation = Quaternion.Euler(Vector3.up * yawAmount );
         
     }
