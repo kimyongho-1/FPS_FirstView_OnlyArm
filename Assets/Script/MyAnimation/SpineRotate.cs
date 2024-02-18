@@ -39,12 +39,10 @@ public class SpineRotate : MonoBehaviour
     [Range(0, 1f)] public float body;
     [Range(0, 1f)] public float head;
     public Transform LeftHandTarget, RightHandTarget, LeftElbow, RightElbow;
-    public Transform WeaponPivot;
+
     [Range(0, 1f)] public float weights;
     private void OnAnimatorIK(int layerIndex)
     {
-        anim.SetLookAtWeight(1, body, head, 0, clampweight);
-        anim.SetLookAtPosition(myInput.LookTarget.position);
 
         GetAnim.SetIKPositionWeight(AvatarIKGoal.RightHand, 1);
         GetAnim.SetIKPosition(AvatarIKGoal.RightHand, RightHandTarget.position);
@@ -62,27 +60,17 @@ public class SpineRotate : MonoBehaviour
 
         GetAnim.SetIKRotationWeight(AvatarIKGoal.LeftHand, weights);
         GetAnim.SetIKRotation(AvatarIKGoal.LeftHand, LeftHandTarget.rotation);
-
+ 
     }
 
-    public Transform upperBody, lowerBody;
+    public Transform upperBody, upperBody2, lowerBody;
     private Quaternion targetRotation; // 상체가 바라보는 방향회전축 : 이후 하체(전신이 강제로 바라볼 방향)
     public Quaternion GetTargetDir { get { return targetRotation; } set { targetRotation = value; } }
     public float rotationDelay = 0.5f; // 하체가 따라오는데 걸리는 시간
 
     public Transform Tr;
-    public float offset = 90f;
     private void Update()
     {
-        Vector3 dir = myInput.LookTarget.position - WeaponPivot.position;
-        Quaternion lookRotation = Quaternion.LookRotation(dir ); 
-        Quaternion offsetRotation = Quaternion.Euler(0, offset, 0);
-
-        // lookRotation에 offsetRotation을 곱합니다.
-        lookRotation = lookRotation * offsetRotation;
-        WeaponPivot.rotation = Quaternion.Slerp(WeaponPivot.rotation, lookRotation, Time.deltaTime / 0.1f);
-        
-        //Debug.Log(upperBody.rotation.eulerAngles.y);
         Vector3 move = Vector3.zero;
         if (Input.GetKey(KeyCode.W))
         {
@@ -93,11 +81,11 @@ public class SpineRotate : MonoBehaviour
         #region 이동없이 회전만 있는 상태라면
         // 이동입력이 없는 상태라면 아래 실행하고 끝내기
         // 유니티 생명주기상에선, 업데이트가 애니메이션프로세스보다 먼저 실행
+        float rotateFinishedTime = rotationDelay; // 제자리회전은 더 빨리 끝나게 설정
+
         if (move == Vector3.zero)
         {
             
-            float rotateFinishedTime = rotationDelay; // 제자리회전은 더 빨리 끝나게 설정
-
             if (GetAnim.GetBool("CurrentTurning") == false)
             {
                 // 전신과 상체의 회전차이량(y축 기준)
@@ -141,10 +129,21 @@ public class SpineRotate : MonoBehaviour
 
     }
 
- 
+
+    public float offsetsUpperBody= 40f;
+    public float offsetGunRot = 90f;
+    public Transform WeaponPivot;
     private void LateUpdate()
     {    
-       // upperBody.rotation = Quaternion.Euler(0, myInput.yawAmount, 0);
-   
+        // 상체 회전
+        upperBody.rotation = Quaternion.Euler(0, myInput.yawAmount + offsetsUpperBody, 0);
+
+        // 총기 타겟방향 바라보도록
+        Vector3 dir = myInput.LookTarget.position - WeaponPivot.position;
+        Quaternion lookRotation = Quaternion.LookRotation(dir);
+        Quaternion offsetRotation = Quaternion.Euler(0, offsetGunRot, 0);
+        // offset만큼 조정.
+        lookRotation = lookRotation * offsetRotation;
+        WeaponPivot.rotation = Quaternion.Slerp(WeaponPivot.rotation, lookRotation, Time.deltaTime / 0.1f);
     }
 }
