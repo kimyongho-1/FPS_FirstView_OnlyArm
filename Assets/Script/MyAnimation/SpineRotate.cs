@@ -90,8 +90,9 @@ public class SpineRotate : MonoBehaviour
         Vector3 aimDirection = gunForward.forward;
         Vector3 targetDirection = ( myInput.LookTarget.position - gunForward.position);
         Quaternion aimTowards = Quaternion.FromToRotation(aimDirection, targetDirection);
-      
-        upperBody2.rotation = Quaternion.Euler(myInput.pitchAmount,0,0); // 어떻게하면 허리축을 완전히 굽힐까..
+        
+        //upperBody2.rotation = aimTowards * upperBody2.rotation;// Quaternion.Euler(myInput.pitchAmount, upperBody2.rotation.y, upperBody2.rotation.z); // 어떻게하면 허리축을 완전히 굽힐까..
+        
         upperBody.rotation = aimTowards * upperBody.rotation; // 이것만 실행시 상체 윗부분만 접히는 현상
     }
 
