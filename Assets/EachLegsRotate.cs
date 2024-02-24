@@ -1,36 +1,33 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Search;
 using UnityEngine;
 
 public class EachLegsRotate : StateMachineBehaviour
 {
-    public RootSpin RS; Quaternion dir;
-    float rotateAmount;
-    // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
+    public RootSpin RS;
+    
     override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
         if (RS == null) { RS = animator.GetComponentInParent<RootSpin>(); }
-        dir = RS.YawRotator.localRotation;
-
+        animator.GetComponent<CharRot>().animationStartTime = Time.time;
+        animator.GetComponent<CharRot>().dirY = animator.GetFloat("y");
+        RS.addRotate = 0;
+        RS.sideRotating = 0;
     }
-
-    // OnStateUpdate is called on each Update frame between OnStateEnter and OnStateExit callbacks
+    
+    private float animationStartTime;
+    private float animationDuration = 0.5f; // 30프레임 동안 진행되는 시간 (초)
     override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        Quaternion ex = RS.transform.rotation;
-        Quaternion rot = Quaternion.Lerp(RS.transform.rotation, dir , Time.deltaTime * 5f);
 
-        RS.transform.rotation = rot;
-        Quaternion amount = Quaternion.Inverse(ex) * rot;
-    
-
-        RS.YawRotator.localRotation  = Quaternion.Inverse(amount) * RS.YawRotator.localRotation ;
     }
 
-    // OnStateExit is called when a transition ends and the state machine finishes evaluating this state
     override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
         animator.SetBool("PelvisRotating", false);
+        
+        RS.sideRotating =RS.addRotate;
     }
 
 }
