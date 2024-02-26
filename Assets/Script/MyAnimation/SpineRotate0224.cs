@@ -52,7 +52,7 @@ public class SpineRotate0224 : MonoBehaviour
 
         headConstraint.data.offset = new Vector3(headConstraint.data.offset.x, headConstraint.data.offset.y,
             offsetDictionary[HumanBodyBones.Head].pitchOffsets.Evaluate(pitchVal));
-
+        
 
         if (anim.GetBool("PelvisRotating") == false)
         {
@@ -82,7 +82,6 @@ public class SpineRotate0224 : MonoBehaviour
     public FootIKData LF_IK, RF_IK;
     public float rayPosOffset, rayDistance;
     public LayerMask groundLayer;
-    public AnimationCurve RF_heightOffset; // 현재 안쓰이고, 어떻게 쓸지 고민중
     Dictionary<string, Action<FootIKData>> footIKfunc;
 
 
@@ -105,7 +104,6 @@ public class SpineRotate0224 : MonoBehaviour
 
     }
     #endregion
-
     private void OnAnimatorIK(int layerIndex)
     {
         const int UPPER = 2;
@@ -116,41 +114,28 @@ public class SpineRotate0224 : MonoBehaviour
             case UPPER: HandIK(); return;
             default: return;
         }
-
         void FootIK()
         {
-            float currRatio = anim.GetCurrentAnimatorStateInfo(1).normalizedTime % 1f;
-            float weight = anim.GetFloat(RF_IK.propertyName);
-            anim.bodyPosition = new Vector3(anim.bodyPosition.x,
-                1f + RF_IK.hitPoint.y , anim.bodyPosition.z);
-
-            //Debug.Log(currRatio);
-            if (Physics.Raycast(RF_IK.rayOrigin.position + (Vector3.up * rayPosOffset), Vector3.down, out RaycastHit hit, rayDistance + weight + rayPosOffset, groundLayer))
-            {
-                if (weight == 1)
-                {
-                    footIKfunc[RF_IK.tag]?.Invoke(RF_IK);
-                }
-                else
-                {// weight값이 0이라도, 현재 장애물이 가까울시 현재 애니메이션 발 높이만큼 띄우기
-                    RF_IK.hitDist = hit.distance;
-                    RF_IK.hitPoint = hit.point;
-                    RF_IK.hitNormal = hit.normal;
-                    RF_IK.hitCollider = hit.collider;
-                    RF_IK.tag = hit.transform.gameObject.tag;
-
-                    footIKfunc[hit.transform.gameObject.tag]?.Invoke(RF_IK);
-                }
+            // Test 하기
+            // 1. weight < 1 : 땅에 닿기전 지면이 발의 포징에 존재시 그만큼 발을 띄우기
+            // => 박스레이에 걸리면 매우 근접한 거리이므로,  닿은 지점만큼 뒤로 밀어야한다 (어떻게 할까)
+            // otherwise ? => 똑같이 일반 레이직선을 발사해서 찾아낸 충돌체의 노말방향만큼 뒤로 밀기?
+            if (Physics.BoxCast(RF_IK.rayOrigin.transform.position + (RF_IK.rayOrigin.up * 0.01f),
+                new Vector3(0.05f, 0.01f, 0.125f), RF_IK.rayOrigin.up, RF_IK.rayOrigin.transform.rotation , 0.3f))
+            { 
                 
-                
-                anim.SetIKRotationWeight(AvatarIKGoal.RightFoot, weight);
-                Vector3 rotAxis = Vector3.Cross(anim.GetBoneTransform(HumanBodyBones.RightFoot).forward, hit.normal);
-                float angle = Vector3.Angle(Vector3.up, hit.normal);
-
-                Quaternion rot = Quaternion.AngleAxis(angle, rotAxis);
-                anim.SetIKRotation(AvatarIKGoal.RightFoot, rot * anim.GetIKRotation(AvatarIKGoal.RightFoot));
             }
-            
+
+
+            // 2. weight > 0.9 : 이제 땅에 닿는 과정 
+            // => 일반 레이 발사하여 확인
+            Debug.DrawRay(RF_IK.rayOrigin.transform.position + (RF_IK.rayOrigin.up * 0.01F), RF_IK.rayOrigin.up * 2f, Color.red);
+            if (Physics.Raycast(RF_IK.rayOrigin.transform.position + (-RF_IK.rayOrigin.up * rayPosOffset) 
+                , RF_IK.rayOrigin.up, out RaycastHit hit , 2f, groundLayer))
+            {
+                Transform rf = anim.GetBoneTransform(HumanBodyBones.RightFoot);   
+            }
+           
         }
 
         void HandIK()
@@ -180,16 +165,29 @@ public class SpineRotate0224 : MonoBehaviour
     #endregion
 
     private void LateUpdate()
-    {
+    {   
+
     }
 
 
     public bool drawFootIK;
     private void OnDrawGizmos()
     {
+        Vector3 rayOriginPosition = RF_IK.rayOrigin.transform.position+ (RF_IK.rayOrigin.up * 0.01f);
+        Vector3 downDirection = RF_IK.rayOrigin.up;
+        Vector3 boxCenter = rayOriginPosition ;
+        Vector3 halfExtents = new Vector3(0.05f, 0.01f, 0.125f);
+        Quaternion orientation = RF_IK.rayOrigin.transform.rotation; // 실제 객체의 회전을 반영
+        float maxDistance = 0.3f;
+
+        // 상자의 실제 월드공간상 위치를 디버그로 그리기
+        Gizmos.color = Color.red;
+        Matrix4x4 rotationMatrix = Matrix4x4.TRS(boxCenter, orientation, Vector3.one);
+        Gizmos.matrix = rotationMatrix;
+        Gizmos.DrawWireCube(Vector3.zero, halfExtents * 2);
         if (RF_IK.drawGizmo)
         {
-            RF_IK.OnDrawGizmos(rayPosOffset, rayDistance);
+          //  RF_IK.OnDrawGizmos(rayPosOffset, rayDistance);
         }
 
         if (UseGizmo)
