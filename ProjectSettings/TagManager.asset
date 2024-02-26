@@ -13,6 +13,9 @@ TagManager:
   - Door
   - hud
   - hitCollider
+  - SlopedPlane
+  - Stairs
+  - SlopedTerrain
   layers:
   - Default
   - TransparentFX

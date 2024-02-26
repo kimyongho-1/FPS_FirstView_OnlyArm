@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -26,9 +27,16 @@ public class SpineRotate0224 : MonoBehaviour
         offsetDictionary.Add(HumanBodyBones.Spine, offsetData.Find(x=>x.boneType == HumanBodyBones.Spine));
         offsetDictionary.Add(HumanBodyBones.UpperChest, offsetData.Find(x => x.boneType == HumanBodyBones.UpperChest));
         offsetDictionary.Add(HumanBodyBones.Head, offsetData.Find(x => x.boneType == HumanBodyBones.Head));
+
+        footIKfunc = new Dictionary<string, Action<FootIKData>>();
+        footIKfunc.Add("SlopedPlane", OnSlopedPlane);
+        footIKfunc.Add("Stairs", OnStairs);
     }
+    public float moveSpeed;
     public void Update()
     {
+        transform.position += transform.forward * Time.deltaTime * moveSpeed;
+
         yawVal += Input.GetAxis("Horizontal") * rotSpeed * Time.deltaTime;
         pitchVal = Mathf.Clamp(pitchVal - Input.GetAxis("Vertical") * rotSpeed * Time.deltaTime, -85f,85f);
 
@@ -71,7 +79,31 @@ public class SpineRotate0224 : MonoBehaviour
     #endregion
 
     #region FootIK VARIABLE
-    //public Transform 
+    public FootIKData LF_IK, RF_IK;
+    public float rayPosOffset, rayDistance;
+    public LayerMask groundLayer;
+    public AnimationCurve RF_heightOffset; // 현재 안쓰이고, 어떻게 쓸지 고민중
+    Dictionary<string, Action<FootIKData>> footIKfunc;
+
+
+    void OnSlopedPlane(FootIKData ikData)
+    {
+        Debug.Log(anim.rightFeetBottomHeight);
+        anim.SetIKPositionWeight(AvatarIKGoal.RightFoot, anim.GetFloat(ikData.propertyName));
+        anim.SetIKPosition(AvatarIKGoal.RightFoot, ikData.hitPoint+ Vector3.up * anim.rightFeetBottomHeight);
+        //new Vector3(0, RF_heightOffset.Evaluate(currRatio), 0)
+    }
+    void OnStairs(FootIKData ikData)
+    {
+        float animHeight = anim.GetBoneTransform(HumanBodyBones.RightFoot).localPosition.y;
+        float y = Mathf.Lerp(ikData.hitDist + animHeight, ikData.hitPoint.y + anim.rightFeetBottomHeight, anim.GetFloat(ikData.propertyName));
+        anim.SetIKPositionWeight(AvatarIKGoal.RightFoot, anim.GetFloat(ikData.propertyName));
+        anim.SetIKPosition(AvatarIKGoal.RightFoot,
+            new Vector3(ikData.hitCollider.transform.position.x,
+             y,
+             ikData.hitCollider.transform.position.z));
+
+    }
     #endregion
 
     private void OnAnimatorIK(int layerIndex)
@@ -80,9 +112,45 @@ public class SpineRotate0224 : MonoBehaviour
         const int LEGS = 1;
         switch (layerIndex)
         {
-            case LEGS: return;
+            case LEGS: FootIK(); return;
             case UPPER: HandIK(); return;
             default: return;
+        }
+
+        void FootIK()
+        {
+            float currRatio = anim.GetCurrentAnimatorStateInfo(1).normalizedTime % 1f;
+            float weight = anim.GetFloat(RF_IK.propertyName);
+            anim.bodyPosition = new Vector3(anim.bodyPosition.x,
+                1f + RF_IK.hitPoint.y , anim.bodyPosition.z);
+
+            //Debug.Log(currRatio);
+            if (Physics.Raycast(RF_IK.rayOrigin.position + (Vector3.up * rayPosOffset), Vector3.down, out RaycastHit hit, rayDistance + weight + rayPosOffset, groundLayer))
+            {
+                if (weight == 1)
+                {
+                    footIKfunc[RF_IK.tag]?.Invoke(RF_IK);
+                }
+                else
+                {// weight값이 0이라도, 현재 장애물이 가까울시 현재 애니메이션 발 높이만큼 띄우기
+                    RF_IK.hitDist = hit.distance;
+                    RF_IK.hitPoint = hit.point;
+                    RF_IK.hitNormal = hit.normal;
+                    RF_IK.hitCollider = hit.collider;
+                    RF_IK.tag = hit.transform.gameObject.tag;
+
+                    footIKfunc[hit.transform.gameObject.tag]?.Invoke(RF_IK);
+                }
+                
+                
+                anim.SetIKRotationWeight(AvatarIKGoal.RightFoot, weight);
+                Vector3 rotAxis = Vector3.Cross(anim.GetBoneTransform(HumanBodyBones.RightFoot).forward, hit.normal);
+                float angle = Vector3.Angle(Vector3.up, hit.normal);
+
+                Quaternion rot = Quaternion.AngleAxis(angle, rotAxis);
+                anim.SetIKRotation(AvatarIKGoal.RightFoot, rot * anim.GetIKRotation(AvatarIKGoal.RightFoot));
+            }
+            
         }
 
         void HandIK()
@@ -115,9 +183,15 @@ public class SpineRotate0224 : MonoBehaviour
     {
     }
 
+
+    public bool drawFootIK;
     private void OnDrawGizmos()
     {
-        
+        if (RF_IK.drawGizmo)
+        {
+            RF_IK.OnDrawGizmos(rayPosOffset, rayDistance);
+        }
+
         if (UseGizmo)
         {
             Gizmos.color = Color.red;
