@@ -4,34 +4,32 @@ using UnityEngine;
 
 public class InputReceiver : MonoBehaviour
 {
-    public Transform YawRotator, PitchRotator, LookTarget;
-    public float power;
-    public float yawAmount,pitchAmount;
+    public UserConfigureData userInputData; // 사용자가 수정가능한 데이터영역
+
+    public float moveSpeed;
+    public float pitchVal, yawVal;
     public Vector2 pitchAngle;
-    private void Update()
+    public Transform Look, YawRotator, PitchRotator;
+  
+    public float mouseX { get { return userInputData.mouseX; } }
+    public float mouseY { get { return userInputData.mouseY; } }
+    public Vector3 movement;
+    public void MovementInput(float speed)
     {
-        if (Input.GetKey(KeyCode.A))
-        {
-            yawAmount -= Time.deltaTime * power;
-        }
+        float forwward = Input.GetAxis("Vertical") * speed * Time.deltaTime;
+        float side = Input.GetAxis("Horizontal") * speed * Time.deltaTime;
 
-        if (Input.GetKey(KeyCode.D))
-        { yawAmount += Time.deltaTime * power; }
+        movement = (YawRotator.forward * forwward + YawRotator.right * side).normalized;
+    }
+    public void DirectionInput()
+    {
+        yawVal += Input.GetAxis("Mouse X") * mouseX * Time.deltaTime;
+        pitchVal = Mathf.Clamp(pitchVal - Input.GetAxis("Mouse Y") * mouseY * Time.deltaTime, -85f, 85f);
 
-        if (Input.GetKey(KeyCode.W))
-        {
-            pitchAmount -= Time.deltaTime * power;
-        }
-        if (Input.GetKey(KeyCode.S))
-        {
-            pitchAmount += Time.deltaTime * power;
-        }
+        yawVal = Mathf.Repeat(yawVal, 360f);
+        pitchVal = Mathf.Clamp(pitchVal, pitchAngle.x, pitchAngle.y);
 
-        yawAmount = Mathf.Repeat(yawAmount, 360f);
-        pitchAmount = Mathf.Clamp(pitchAmount, pitchAngle.x, pitchAngle.y);
-
-        PitchRotator.localRotation = Quaternion.Euler(Vector3.right * pitchAmount);
-        YawRotator.localRotation = Quaternion.Euler(Vector3.up * yawAmount );
-        
+        YawRotator.localRotation = Quaternion.Euler(Vector3.up * yawVal);
+        PitchRotator.localRotation = Quaternion.Euler(Vector3.right * pitchVal);
     }
 }

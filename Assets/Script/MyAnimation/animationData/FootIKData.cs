@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -6,22 +7,56 @@ using UnityEngine;
 [System.Serializable]
 public class FootIKData
 {
-    public HumanBodyBones bodyPart;
-    public bool isGround, drawGizmo;
+    public float heightOffset;
+    public float rayHeightOffset, rayLengeth;
+    public Transform[] raycastPivot;
+    
     public string propertyName, tag;
-    public Vector3 pos;
-    public Quaternion rot;
-    [HideInInspector] public Vector3 hitNormal;
-    [HideInInspector] public Vector3 hitPoint;
-    [HideInInspector] public float hitDist;
-    [HideInInspector] public Collider hitCollider;
-    public Transform rayOrigin;
-
-    public void OnDrawGizmos(float rayPosOffset, float rayDistance)
+    Nullable<RaycastHit> hit;
+    public float feetHeight
     {
-        Gizmos.color = Color.yellow;
-        Vector3 start = rayOrigin.position + (Vector3.up * rayPosOffset);
-        Vector3 end = start + (Vector3.down * (rayDistance + rayPosOffset));
-        Gizmos.DrawLine(start, end);
+        get
+        { return anim.GetBoneTransform(bodyPart).position.y; }
+    }
+    public float GetWeight 
+    { get { return anim.GetFloat(propertyName); } }
+    public Nullable<RaycastHit> GetHit()
+    {
+        return hit;
+    }
+    public Vector3 GetNormal { get { return hit.Value.normal;  } }
+    Animator anim;
+    [HideInInspector]public AvatarIKGoal bodyPartGoal;
+    public HumanBodyBones bodyPart;
+    public void Init(Animator a)
+    {
+        anim = a;
+        bodyPartGoal = (bodyPart == HumanBodyBones.RightFoot) ? AvatarIKGoal.RightFoot : AvatarIKGoal.LeftFoot;
+
+    }
+    
+
+    public void CheckRay(LayerMask groundLayer, int idx = 0)
+    {
+        Vector3 start = raycastPivot[idx].position - raycastPivot[idx].up * rayHeightOffset;
+        Vector3 end = start + raycastPivot[idx].up * (rayLengeth);
+        Debug.DrawLine(start, end, Color.red);
+        if ( Physics.Raycast(raycastPivot[idx].position - raycastPivot[idx].up * rayHeightOffset
+            , raycastPivot[idx].up, out RaycastHit hits ,  rayLengeth, groundLayer))
+        {
+            hit = hits;   
+            return ;
+        }
+        else
+        {
+            idx++;
+            if (idx == raycastPivot.Length) 
+            {
+                hit = null;
+                return ; 
+            }
+
+            CheckRay(groundLayer, idx);
+        }
     }
 }

@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.InputSystem.XR;
+using static UnityEngine.UI.GridLayoutGroup;
 
 public class TurnRotate : StateMachineBehaviour
 {
@@ -15,11 +17,10 @@ public class TurnRotate : StateMachineBehaviour
         if (SR == null)
         {
             SR = animator.GetComponent<SpineRotate0224>();
-           
-            finishedTime = animator.GetCurrentAnimatorClipInfo(layerIndex).FirstOrDefault(x=>x.clip.name == "RotatePose").clip.length 
-                * 0.75f;
+            finishedTime = animator.GetCurrentAnimatorClipInfo(layerIndex).FirstOrDefault(x=>x.clip.name == "RotatePose").clip.length
+            * 0.75f;
         }
-
+        SR.anim.SetLayerWeight(AnimLayer.LowerRotate, 1f);
         animator.SetBool("PelvisRotating", true);
         startRot = SR.transform.rotation;
         rotateStartTime = Time.time;
@@ -29,7 +30,7 @@ public class TurnRotate : StateMachineBehaviour
     override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
         float processingTime = Time.time - rotateStartTime;
-        Quaternion destRot = SR.YawRotator.localRotation;
+        Quaternion destRot = SR.YawRotater.localRotation;
         if (processingTime < finishedTime)
         {
             SR.transform.rotation = Quaternion.Slerp(startRot , destRot  , (processingTime / finishedTime) );
@@ -40,6 +41,7 @@ public class TurnRotate : StateMachineBehaviour
     override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
         animator.SetBool("PelvisRotating",false);
+        SR.anim.SetLayerWeight(AnimLayer.LowerRotate,0f);
     }
 
     // OnStateMove is called right after Animator.OnAnimatorMove()

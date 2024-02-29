@@ -1,14 +1,17 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
 
 public class SpineRotate0224 : MonoBehaviour
 {
+    OtherPlayerController PC; InputReceiver myInput;
     public Transform  GunPivot,GunDirection;
-    public Transform Look, YawRotator, PitchRotator;
-    public float pitchVal, yawVal, rotSpeed;
+    public Transform Look { get { return PC.Look; } }
+    public Transform YawRotater { get { return PC.YawRotator; } }
+    public Transform PitchRotator { get { return PC.PitchRotator; } }
 
     #region AnimRigging Data
     public AnimationCurve spineWeightRatio, gunPositionOffsetsX, gunPositionOffsetsY;
@@ -18,57 +21,53 @@ public class SpineRotate0224 : MonoBehaviour
     #endregion
 
     public bool UseGizmo;
-    Animator anim;
+    [HideInInspector]public Animator anim;
     
-    private void Awake()
+    public void Init(OtherPlayerController p, InputReceiver pi)
     {
         anim = GetComponent<Animator>();
+        p.Model = anim;
+        PC = p;
+        myInput = pi;
+
         offsetDictionary = new Dictionary<HumanBodyBones, SpineOffsetData>();
         offsetDictionary.Add(HumanBodyBones.Spine, offsetData.Find(x=>x.boneType == HumanBodyBones.Spine));
         offsetDictionary.Add(HumanBodyBones.UpperChest, offsetData.Find(x => x.boneType == HumanBodyBones.UpperChest));
         offsetDictionary.Add(HumanBodyBones.Head, offsetData.Find(x => x.boneType == HumanBodyBones.Head));
+        LF_IK.Init(anim);
+        RF_IK.Init(anim);
 
         footIKfunc = new Dictionary<string, Action<FootIKData>>();
         footIKfunc.Add("SlopedPlane", OnSlopedPlane);
         footIKfunc.Add("Stairs", OnStairs);
     }
-    public float moveSpeed;
-    public void Update()
+    public void ModelUpdate()
     {
-        transform.position += transform.forward * Time.deltaTime * moveSpeed;
-
-        yawVal += Input.GetAxis("Horizontal") * rotSpeed * Time.deltaTime;
-        pitchVal = Mathf.Clamp(pitchVal - Input.GetAxis("Vertical") * rotSpeed * Time.deltaTime, -85f,85f);
-
-        YawRotator.localRotation = Quaternion.AngleAxis(yawVal, Vector3.up);
-        PitchRotator.localRotation =  Quaternion.AngleAxis(pitchVal, Vector3.right);
-
-        spineConstraint.weight = spineWeightRatio.Evaluate(pitchVal);
-        spineConstraint.data.offset = new Vector3(offsetDictionary[HumanBodyBones.Spine].pitchOffsets.Evaluate(pitchVal),
+        spineConstraint.weight = spineWeightRatio.Evaluate(myInput.pitchVal);
+        spineConstraint.data.offset = new Vector3(offsetDictionary[HumanBodyBones.Spine].pitchOffsets.Evaluate(myInput.pitchVal),
             spineConstraint.data.offset.y, spineConstraint.data.offset.z);
 
-        upperChestConstraint.data.offset = new Vector3(offsetDictionary[HumanBodyBones.UpperChest].pitchOffsets.Evaluate(pitchVal),
+        upperChestConstraint.data.offset = new Vector3(offsetDictionary[HumanBodyBones.UpperChest].pitchOffsets.Evaluate(myInput.pitchVal),
             upperChestConstraint.data.offset.y, upperChestConstraint.data.offset.z);
 
         headConstraint.data.offset = new Vector3(headConstraint.data.offset.x, headConstraint.data.offset.y,
-            offsetDictionary[HumanBodyBones.Head].pitchOffsets.Evaluate(pitchVal));
-        
-
-        if (anim.GetBool("PelvisRotating") == false)
-        {
-            float angle = Vector3.SignedAngle(transform.forward, YawRotator.forward, Vector3.up);
-            //Debug.Log(angle);
-            if (angle > 45f)
-            {
-                anim.PlayInFixedTime("RightRotate", 1);
-            }
-            else if (angle < -35f)
-            {
-                anim.PlayInFixedTime("LeftRotate", 1);
-            }
-        }
+            offsetDictionary[HumanBodyBones.Head].pitchOffsets.Evaluate(myInput.pitchVal));
 
 
+        // TO DO : IDLE상태일떄만 하도록 스테이트머신.CS로 옮길 예정
+       //if (anim.GetBool("PelvisRotating") == false)
+       //{
+       //    float angle = Vector3.SignedAngle(transform.forward, YawRotater.forward, Vector3.up);
+       //    //Debug.Log(angle);
+       //    if (angle > 45f)
+       //    {
+       //        anim.PlayInFixedTime("RightRotate", 1);
+       //    }
+       //    else if (angle < -35f)
+       //    {
+       //        anim.PlayInFixedTime("LeftRotate", 1);
+       //    }
+       //}
     }
 
     #region OnAnimatorIK()
@@ -80,27 +79,24 @@ public class SpineRotate0224 : MonoBehaviour
 
     #region FootIK VARIABLE
     public FootIKData LF_IK, RF_IK;
-    public float rayPosOffset, rayDistance;
     public LayerMask groundLayer;
     Dictionary<string, Action<FootIKData>> footIKfunc;
-
-
+    public float add = 0.2f;
     void OnSlopedPlane(FootIKData ikData)
     {
-        Debug.Log(anim.rightFeetBottomHeight);
-        anim.SetIKPositionWeight(AvatarIKGoal.RightFoot, anim.GetFloat(ikData.propertyName));
-        anim.SetIKPosition(AvatarIKGoal.RightFoot, ikData.hitPoint+ Vector3.up * anim.rightFeetBottomHeight);
+       //anim.SetIKPositionWeight(AvatarIKGoal.RightFoot, anim.GetFloat(ikData.propertyName));
+       //anim.SetIKPosition(AvatarIKGoal.RightFoot, ikData.hitPoint+ Vector3.up * anim.rightFeetBottomHeight);
         //new Vector3(0, RF_heightOffset.Evaluate(currRatio), 0)
     }
     void OnStairs(FootIKData ikData)
     {
-        float animHeight = anim.GetBoneTransform(HumanBodyBones.RightFoot).localPosition.y;
-        float y = Mathf.Lerp(ikData.hitDist + animHeight, ikData.hitPoint.y + anim.rightFeetBottomHeight, anim.GetFloat(ikData.propertyName));
-        anim.SetIKPositionWeight(AvatarIKGoal.RightFoot, anim.GetFloat(ikData.propertyName));
-        anim.SetIKPosition(AvatarIKGoal.RightFoot,
-            new Vector3(ikData.hitCollider.transform.position.x,
-             y,
-             ikData.hitCollider.transform.position.z));
+       // float animHeight = anim.GetBoneTransform(HumanBodyBones.RightFoot).localPosition.y;
+       // float y = Mathf.Lerp(ikData.hitDist + animHeight, ikData.hitPoint.y + anim.rightFeetBottomHeight, anim.GetFloat(ikData.propertyName));
+       // anim.SetIKPositionWeight(AvatarIKGoal.RightFoot, anim.GetFloat(ikData.propertyName));
+       // anim.SetIKPosition(AvatarIKGoal.RightFoot,
+       //     new Vector3(ikData.hitCollider.transform.position.x,
+       //      y,
+       //      ikData.hitCollider.transform.position.z));
 
     }
     #endregion
@@ -112,37 +108,49 @@ public class SpineRotate0224 : MonoBehaviour
         {
             case LEGS: FootIK(); return;
             case UPPER: HandIK(); return;
-            default: return;
+            default: HandIK(); return;
         }
         void FootIK()
         {
-            // Test 하기
-            // 1. weight < 1 : 땅에 닿기전 지면이 발의 포징에 존재시 그만큼 발을 띄우기
-            // => 박스레이에 걸리면 매우 근접한 거리이므로,  닿은 지점만큼 뒤로 밀어야한다 (어떻게 할까)
-            // otherwise ? => 똑같이 일반 레이직선을 발사해서 찾아낸 충돌체의 노말방향만큼 뒤로 밀기?
-            if (Physics.BoxCast(RF_IK.rayOrigin.transform.position + (RF_IK.rayOrigin.up * 0.01f),
-                new Vector3(0.05f, 0.01f, 0.125f), RF_IK.rayOrigin.up, RF_IK.rayOrigin.transform.rotation , 0.3f))
+          
+            SetFootIK(LF_IK);
+            SetFootIK(RF_IK);
+            void SetFootIK(FootIKData fid)
             { 
-                
-            }
+                // 다중 레이캐스트
+                fid.CheckRay(groundLayer);
 
+                Nullable<RaycastHit> hit = fid.GetHit();
+                if (hit != null)
+                {
+                    RaycastHit hits = hit.Value;
+                    float weight = fid.GetWeight;
+                    // 캐릭터 루트포지션 (0벡터)를 기준으로 상대적인 현재 발의 위치값 찾기 : 애니메이션이 현재 적용된 발의 위치
+                    Vector3 footPos = anim.GetBoneTransform(fid.bodyPart).position;
+                    // Height Offset 찾기 : weight가 1이면 지면에 붙어야하기에 offset은 기본으로 고정
+                    float height =  Mathf.Lerp(add+ fid.heightOffset, fid.heightOffset, weight);
+               
+                    // 발이 지면으로 부터 얼마나 떨어져있어야하는지 적용
+                    Vector3 newFootPos = new Vector3(footPos.x, hits.point.y+ height, footPos.z);
+                    anim.SetIKPositionWeight(fid.bodyPartGoal, 1f); // weight를 강제 1로 고정
+                    anim.SetIKPosition(fid.bodyPartGoal, newFootPos);
 
-            // 2. weight > 0.9 : 이제 땅에 닿는 과정 
-            // => 일반 레이 발사하여 확인
-            Debug.DrawRay(RF_IK.rayOrigin.transform.position + (RF_IK.rayOrigin.up * 0.01F), RF_IK.rayOrigin.up * 2f, Color.red);
-            if (Physics.Raycast(RF_IK.rayOrigin.transform.position + (-RF_IK.rayOrigin.up * rayPosOffset) 
-                , RF_IK.rayOrigin.up, out RaycastHit hit , 2f, groundLayer))
-            {
-                Transform rf = anim.GetBoneTransform(HumanBodyBones.RightFoot);   
+                    // rotation
+                    anim.SetIKRotationWeight(fid.bodyPartGoal, weight);// weight
+                    Vector3 rotAxis = Vector3.Cross(Vector3.up, hits.normal);
+                    float angle = Vector3.Angle(Vector3.up, hits.normal);
+                    Quaternion rot = Quaternion.AngleAxis(angle, rotAxis);
+                    anim.SetIKRotation(fid.bodyPartGoal,  rot * anim.GetIKRotation(fid.bodyPartGoal));
+                }
+
             }
-           
+         
         }
 
         void HandIK()
         {
-            GunDirection.LookAt(Look.position);
-            GunDirection.localPosition = new Vector3(gunPositionOffsetsX.Evaluate(pitchVal), gunPositionOffsetsY.Evaluate(pitchVal), 0);
-          
+            //GunDirection.localPosition = new Vector3(gunPositionOffsetsX.Evaluate(myInput.pitchVal), gunPositionOffsetsY.Evaluate(myInput.pitchVal), 0);
+            //GunDirection.LookAt(Look.position);
             #region HAND_IK
             anim.SetIKRotationWeight(AvatarIKGoal.RightHand, 1f);
             anim.SetIKRotation(AvatarIKGoal.RightHand, RT.rotation);
@@ -164,31 +172,10 @@ public class SpineRotate0224 : MonoBehaviour
     }
     #endregion
 
-    private void LateUpdate()
-    {   
-
-    }
 
 
-    public bool drawFootIK;
     private void OnDrawGizmos()
     {
-        Vector3 rayOriginPosition = RF_IK.rayOrigin.transform.position+ (RF_IK.rayOrigin.up * 0.01f);
-        Vector3 downDirection = RF_IK.rayOrigin.up;
-        Vector3 boxCenter = rayOriginPosition ;
-        Vector3 halfExtents = new Vector3(0.05f, 0.01f, 0.125f);
-        Quaternion orientation = RF_IK.rayOrigin.transform.rotation; // 실제 객체의 회전을 반영
-        float maxDistance = 0.3f;
-
-        // 상자의 실제 월드공간상 위치를 디버그로 그리기
-        Gizmos.color = Color.red;
-        Matrix4x4 rotationMatrix = Matrix4x4.TRS(boxCenter, orientation, Vector3.one);
-        Gizmos.matrix = rotationMatrix;
-        Gizmos.DrawWireCube(Vector3.zero, halfExtents * 2);
-        if (RF_IK.drawGizmo)
-        {
-          //  RF_IK.OnDrawGizmos(rayPosOffset, rayDistance);
-        }
 
         if (UseGizmo)
         {
