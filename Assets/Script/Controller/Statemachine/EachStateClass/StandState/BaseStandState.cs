@@ -7,7 +7,7 @@ public class BaseStandState : ICState
     protected float standSpeed = 1f;
 
     public BaseStandState(OtherPlayerController owner) 
-    { Owner = owner; Debug.Log("BASED"); }
+    { Owner = owner;  }
 
     public MyBaseController Owner;
     public virtual void Enter()

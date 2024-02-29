@@ -8,19 +8,17 @@ using UnityEngine.Animations.Rigging;
 public class SpineRotate0224 : MonoBehaviour
 {
     OtherPlayerController PC; InputReceiver myInput;
-    public Transform  GunPivot,GunDirection;
     public Transform Look { get { return PC.Look; } }
     public Transform YawRotater { get { return PC.YawRotator; } }
     public Transform PitchRotator { get { return PC.PitchRotator; } }
 
     #region AnimRigging Data
-    public AnimationCurve spineWeightRatio, gunPositionOffsetsX, gunPositionOffsetsY;
     public MultiAimConstraint spineConstraint, upperChestConstraint, headConstraint;
+    public MultiPositionConstraint gunPosConstraint;
     public List<SpineOffsetData> offsetData;
     Dictionary<HumanBodyBones, SpineOffsetData> offsetDictionary;
     #endregion
 
-    public bool UseGizmo;
     [HideInInspector]public Animator anim;
     
     public void Init(OtherPlayerController p, InputReceiver pi)
@@ -41,39 +39,40 @@ public class SpineRotate0224 : MonoBehaviour
         footIKfunc.Add("SlopedPlane", OnSlopedPlane);
         footIKfunc.Add("Stairs", OnStairs);
     }
+
+    float aimRatio = 0;
     public void ModelUpdate()
     {
-        spineConstraint.weight = spineWeightRatio.Evaluate(myInput.pitchVal);
-        spineConstraint.data.offset = new Vector3(offsetDictionary[HumanBodyBones.Spine].pitchOffsets.Evaluate(myInput.pitchVal),
-            spineConstraint.data.offset.y, spineConstraint.data.offset.z);
+        aimRatio = Mathf.Clamp01(Mathf.Clamp01((Input.GetMouseButton(1)) ? aimRatio + Time.deltaTime * 3f : aimRatio - Time.deltaTime * 3f) );
+        WeightedTransformArray gunConst = gunPosConstraint.data.sourceObjects;
+        
+        gunConst.SetWeight(0,1-aimRatio);
+        gunConst.SetWeight(1,aimRatio);
+        gunPosConstraint.data.sourceObjects = gunConst;
 
-        upperChestConstraint.data.offset = new Vector3(offsetDictionary[HumanBodyBones.UpperChest].pitchOffsets.Evaluate(myInput.pitchVal),
-            upperChestConstraint.data.offset.y, upperChestConstraint.data.offset.z);
+        if (myInput.pitchVal < 0f)
+        {
+            spineConstraint.weight = Mathf.Lerp(0.6f, 0.2f, Mathf.Clamp01(myInput.pitchVal / -85f));
+        }
+        else { spineConstraint.weight = 0.6f; }
 
-        headConstraint.data.offset = new Vector3(headConstraint.data.offset.x, headConstraint.data.offset.y,
-            offsetDictionary[HumanBodyBones.Head].pitchOffsets.Evaluate(myInput.pitchVal));
+        Vector3 nonAim = new Vector3(-10, 45, 0);
+        Vector3 Aim = new Vector3(-15, 45, 0);
+        spineConstraint.data.offset = Vector3.Lerp(nonAim, Aim, aimRatio);
 
+        nonAim = new Vector3(5, 45, 0);
+        Aim = new Vector3(20, 45, 0);
+        upperChestConstraint.data.offset = Vector3.Lerp(nonAim, Aim, aimRatio);
 
-        // TO DO : IDLE상태일떄만 하도록 스테이트머신.CS로 옮길 예정
-       //if (anim.GetBool("PelvisRotating") == false)
-       //{
-       //    float angle = Vector3.SignedAngle(transform.forward, YawRotater.forward, Vector3.up);
-       //    //Debug.Log(angle);
-       //    if (angle > 45f)
-       //    {
-       //        anim.PlayInFixedTime("RightRotate", 1);
-       //    }
-       //    else if (angle < -35f)
-       //    {
-       //        anim.PlayInFixedTime("LeftRotate", 1);
-       //    }
-       //}
+        nonAim = new Vector3(15, 2, -6);
+        Aim = new Vector3(32, 10, -24);
+        headConstraint.data.offset = Vector3.Lerp(nonAim, Aim, aimRatio);
+
     }
 
     #region OnAnimatorIK()
 
     #region HandIK VARIABLE
-    public AnimationCurve gunRotateOffset;
     public Transform LT, RT, LE, RE;
     #endregion
 
@@ -149,8 +148,6 @@ public class SpineRotate0224 : MonoBehaviour
 
         void HandIK()
         {
-            //GunDirection.localPosition = new Vector3(gunPositionOffsetsX.Evaluate(myInput.pitchVal), gunPositionOffsetsY.Evaluate(myInput.pitchVal), 0);
-            //GunDirection.LookAt(Look.position);
             #region HAND_IK
             anim.SetIKRotationWeight(AvatarIKGoal.RightHand, 1f);
             anim.SetIKRotation(AvatarIKGoal.RightHand, RT.rotation);
@@ -173,32 +170,9 @@ public class SpineRotate0224 : MonoBehaviour
     #endregion
 
 
-
     private void OnDrawGizmos()
     {
 
-        if (UseGizmo)
-        {
-            Gizmos.color = Color.red;
-            Transform bone = GunDirection;
-            Gizmos.DrawLine(bone.position, bone.position+ bone.forward * 40f);
-            return;
-            Gizmos.color = Color.black;
-            Gizmos.DrawLine(transform.position, Vector3.up * 10f);
-            Gizmos.DrawRay(transform.position, Vector3.up * 10f);
-
-            Gizmos.color = Color.red;
-             bone = spineConstraint.data.constrainedObject;
-            Gizmos.DrawLine(bone.position, bone.forward * 20f);
-
-            Gizmos.color = Color.green;
-            bone = upperChestConstraint.data.constrainedObject;
-            Gizmos.DrawLine(bone.position, bone.forward * 20f);
-
-            Gizmos.color = Color.blue;
-            bone = headConstraint.data.constrainedObject;
-            Gizmos.DrawLine(bone.position, bone.forward * 20f);
-
-        }
+      
     }
 }
