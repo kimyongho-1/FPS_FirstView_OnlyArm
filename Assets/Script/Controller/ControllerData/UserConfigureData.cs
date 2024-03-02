@@ -6,6 +6,4 @@ using UnityEngine;
 public class UserConfigureData 
 {
     [Range(0, 100f)] public float mouseX, mouseY;
-
-    
 }

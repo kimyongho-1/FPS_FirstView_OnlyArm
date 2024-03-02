@@ -17,7 +17,7 @@ public class StandWalkState : BaseStandState
 
     public override void FixedUpdate()
     {
-        Owner.RB.AddForce( Owner.myInput.movement - Owner.RB.velocity, ForceMode.VelocityChange);
+        base.FixedUpdate();
     }
 
 

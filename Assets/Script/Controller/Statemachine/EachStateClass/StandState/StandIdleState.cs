@@ -26,6 +26,7 @@ public class StandIdleState : BaseStandState
 
     public override void FixedUpdate()
     {
+        Owner.RB.AddForce(Owner.GroundCheck(), ForceMode.VelocityChange);
     }
     public override void Update()
     {
