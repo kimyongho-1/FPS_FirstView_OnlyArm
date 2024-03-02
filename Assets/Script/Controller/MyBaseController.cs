@@ -9,6 +9,7 @@ public abstract class MyBaseController : MonoBehaviour
     [HideInInspector] public Animator Model;
     [HideInInspector] public InputReceiver myInput;
     public bool IsGround;
+    public float slopedAngle;
     public virtual void Awake()
     {
         RB = GetComponent<Rigidbody>();

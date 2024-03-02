@@ -19,10 +19,11 @@ public class InputReceiver : MonoBehaviour
     public Vector3 movement;
     public void MovementInput(float speed)
     {
+        // 속력 초기화
         movement = Vector3.zero;
-        float forwward = Input.GetAxis("Vertical") ;
-        float side = Input.GetAxis("Horizontal") ;
-        
+        // 키입력
+        float forwward = Input.GetAxis("Vertical");
+        float side = Input.GetAxis("Horizontal");
         movement += (YawRotator.forward * forwward + YawRotator.right * side).normalized * speed ;
     }
     public void DirectionInput()

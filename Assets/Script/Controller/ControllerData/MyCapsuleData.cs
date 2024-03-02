@@ -8,7 +8,7 @@ public class MyCapsuleData
     public CapsuleCollider collider;
     public LayerMask groundMask;
     public AnimationCurve slopeCurve;
-
+    
     [Range(0.6f, 1.6f)] public float colHeight;
     public float rayLength = 0.01f;
 
