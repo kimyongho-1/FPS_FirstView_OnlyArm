@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class StandIdleState : BaseStandState
 {
-    public StandIdleState(OtherPlayerController owner) : base(owner) { }
+    public StandIdleState(MyBaseController owner) : base(owner) { }
 
     public override void Enter()
     {
@@ -43,21 +43,17 @@ public class StandIdleState : BaseStandState
     }
     public override void ModelUpdate()
     {
-        base.ModelUpdate();  
+        base.ModelUpdate();
         if (Owner.Model.GetBool("PelvisRotating") == false)
         {
             // 회전 애니메이션 레이어의 가중치는
             // 내부 스테이트머신비헤이버스크립트 Enter에서 1로 상승시키는 구조
             float angle = Vector3.SignedAngle(Owner.Model.transform.forward, Owner.myInput.YawRotator.forward, Vector3.up);
-            //Debug.Log(angle);
+       
             if (angle > 45f)
-            {
-                Owner.Model.PlayInFixedTime("RightRotate", 1);
-            }
+            { Owner.Model.PlayInFixedTime("RightRotate", 1); }
             else if (angle < -35f)
-            {
-                Owner.Model.PlayInFixedTime("LeftRotate", 1);
-            }
+            { Owner.Model.PlayInFixedTime("LeftRotate", 1); }
         }
     }
 }

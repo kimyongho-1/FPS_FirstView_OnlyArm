@@ -4,6 +4,7 @@ using UnityEngine;
 
 public abstract class MyBaseController : MonoBehaviour
 {
+    [HideInInspector] public SpineRotate SR;
     public SMB_Character StateMachine;
     [HideInInspector] public Rigidbody RB;
     [HideInInspector] public Animator Model;

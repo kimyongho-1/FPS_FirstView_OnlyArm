@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class StandWalkState : BaseStandState
 {
-    public StandWalkState(OtherPlayerController owner) : base(owner) { }
+    public StandWalkState(MyBaseController owner) : base(owner) { }
     public override void Enter()
     {
         base.Enter();

@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class StandRunState : BaseStandState
 {
-    public StandRunState(OtherPlayerController owner) : base(owner) { }
+    public StandRunState(MyBaseController owner) : base(owner) { }
     public override void Enter()
     {
         base.Enter();

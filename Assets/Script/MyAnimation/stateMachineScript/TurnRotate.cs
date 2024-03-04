@@ -7,7 +7,7 @@ using static UnityEngine.UI.GridLayoutGroup;
 
 public class TurnRotate : StateMachineBehaviour
 {
-    SpineRotate0224 SR;
+    public SpineRotate SR;
     float rotateStartTime;
     public float finishedTime ;
     Quaternion startRot;
@@ -16,7 +16,7 @@ public class TurnRotate : StateMachineBehaviour
     {
         if (SR == null)
         {
-            SR = animator.GetComponent<SpineRotate0224>();
+            SR = animator.GetComponent<SpineRotate>();
             finishedTime = animator.GetCurrentAnimatorClipInfo(layerIndex).FirstOrDefault(x=>x.clip.name == "RotatePose").clip.length
             * 0.75f;
         }
@@ -33,6 +33,7 @@ public class TurnRotate : StateMachineBehaviour
         Quaternion destRot = SR.YawRotater.localRotation;
         if (processingTime < finishedTime)
         {
+            
             SR.transform.rotation = Quaternion.Slerp(startRot , destRot  , (processingTime / finishedTime) );
         }
     }

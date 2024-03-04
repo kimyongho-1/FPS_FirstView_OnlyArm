@@ -5,7 +5,6 @@ using UnityEngine;
 
 public class OtherPlayerController : MyBaseController
 {
-    SpineRotate0224 SR; 
     public MyCapsuleData CapsuleData;
     public Vector3 GetColliderCenterInWS()
     { return CapsuleData.collider.bounds.center; }
@@ -14,7 +13,7 @@ public class OtherPlayerController : MyBaseController
     public override void Awake()
     {
         base.Awake();
-        SR = transform.GetComponentInChildren<SpineRotate0224>();
+        SR = transform.GetComponentInChildren<SpineRotate>();
         SR.Init(this, myInput);
         StateMachine = new SMB_Character(this);
     }
@@ -47,7 +46,7 @@ public class OtherPlayerController : MyBaseController
         {
             IsGround = true;
             slopedAngle = CapsuleData.slopeCurve.Evaluate(Vector3.Angle(Vector3.up, hit.normal));
-            Debug.Log(slopedAngle);
+            //Debug.Log(slopedAngle);
             if (slopedAngle < 0)
             {
                 // 오른손 법칙을 이용해서 월드상 업벡터와 노말방향과 외적하여 현재 hit오브젝트의 right축 구하기
@@ -81,12 +80,9 @@ public class OtherPlayerController : MyBaseController
         // 입력 실행
         StateMachine.CurrState.Update();
 
-        // 입력처리에 따른 모델 애니메이션 업데이트
-        SR.ModelUpdate();
     }
     private void FixedUpdate()
     {
-        
         StateMachine.CurrState.FixedUpdate();
     }
 

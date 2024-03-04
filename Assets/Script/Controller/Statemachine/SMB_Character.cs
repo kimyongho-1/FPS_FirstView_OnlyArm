@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class SMB_Character : SMB_Base
 {
-    public SMB_Character(OtherPlayerController owner)
+    public SMB_Character(MyBaseController owner)
     {
         StandIdleState = new StandIdleState(owner);
         StandWalkState = new StandWalkState(owner);

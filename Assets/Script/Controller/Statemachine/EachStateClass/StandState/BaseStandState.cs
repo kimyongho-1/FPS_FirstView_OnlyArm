@@ -6,7 +6,7 @@ public class BaseStandState : ICState
 {
     protected float standSpeed = 1f;
 
-    public BaseStandState(OtherPlayerController owner)
+    public BaseStandState(MyBaseController owner)
     { Owner = owner; }
 
     public MyBaseController Owner;
@@ -52,10 +52,8 @@ public class BaseStandState : ICState
 
     }
     public virtual void ModelUpdate()
-    { }
-    public void Sliding()
-    { 
-        // 방향은 유지 + 단 slope값이 0보다 큰 수가 될떄까지 미끄러지기
-
+    {
+        Owner.SR.ModelUpdate();
     }
+ 
 }
