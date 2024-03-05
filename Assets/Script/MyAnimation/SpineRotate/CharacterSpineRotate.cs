@@ -10,7 +10,7 @@ using static UnityEngine.UI.GridLayoutGroup;
 public class CharacterSpineRotate : SpineRotate
 {
     public FpsArmSpringTransform fast;
-
+    [HideInInspector]public Animator ArmModel;
     #region AnimRigging Data
     public MultiAimConstraint spineConstraint, upperChestConstraint, headConstraint;
     public MultiPositionConstraint gunPosConstraint;
@@ -122,7 +122,8 @@ public class CharacterSpineRotate : SpineRotate
     public override void Init(MyBaseController p, InputReceiver pi)
     {
         anim = GetComponent<Animator>();
-        p.Model = anim;
+        ArmModel = fast.GetComponent<Animator>();
+        p.FullBodyModel = anim;
         PC = p;
         myInput = pi;
 

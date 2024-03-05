@@ -8,7 +8,7 @@ public class StandWalkState : BaseStandState
     public override void Enter()
     {
         base.Enter();
-        Owner.Model.CrossFadeInFixedTime("Walk Forward", 0.1f, 0);
+        Owner.FullBodyModel.CrossFadeInFixedTime("Walk Forward", 0.1f, 0);
     }
 
     public override void Exit()
@@ -40,6 +40,6 @@ public class StandWalkState : BaseStandState
     }
     public override void ModelUpdate()
     {
-        Owner.Model.transform.rotation = Owner.myInput.YawRotator.localRotation;
+        Owner.FullBodyModel.transform.rotation = Owner.myInput.YawRotator.localRotation;
     }
 }

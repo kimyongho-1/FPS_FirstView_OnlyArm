@@ -7,7 +7,7 @@ public abstract class MyBaseController : MonoBehaviour
     [HideInInspector] public SpineRotate SR;
     public SMB_Character StateMachine;
     [HideInInspector] public Rigidbody RB;
-    [HideInInspector] public Animator Model;
+    public Animator FullBodyModel { get; set; }
     [HideInInspector] public InputReceiver myInput;
     public bool IsGround;
     public float slopedAngle;
@@ -15,7 +15,6 @@ public abstract class MyBaseController : MonoBehaviour
     {
         RB = GetComponent<Rigidbody>();
         myInput = GetComponent<InputReceiver>();
-        Model = GetComponent<Animator>();
     }
     public virtual Vector3 GroundCheck() { return default; }
     public Transform Look { get { return myInput.Look; } }
