@@ -9,6 +9,7 @@ using static UnityEngine.UI.GridLayoutGroup;
 // 1인칭 | FPS 암 모델의 절차적 애니메이션 진행
 public class CharacterSpineRotate : SpineRotate
 {
+    public Transform CamPivot;
     public FpsArmSpringTransform fast;
     [HideInInspector]public Animator ArmModel;
     #region AnimRigging Data
@@ -99,7 +100,8 @@ public class CharacterSpineRotate : SpineRotate
         {
             #region HAND_IK
             anim.SetIKRotationWeight(AvatarIKGoal.RightHand, 1f);
-            anim.SetIKRotation(AvatarIKGoal.RightHand, RT.rotation);
+            //anim.SetIKRotation(AvatarIKGoal.RightHand, RT.rotation);
+            anim.SetBoneLocalRotation(HumanBodyBones.RightHand, RT.localRotation);
             anim.SetIKPositionWeight(AvatarIKGoal.RightHand, 1f);
             anim.SetIKPosition(AvatarIKGoal.RightHand, RT.position);
 
@@ -107,7 +109,8 @@ public class CharacterSpineRotate : SpineRotate
             anim.SetIKHintPosition(AvatarIKHint.RightElbow, RE.position);
 
             anim.SetIKRotationWeight(AvatarIKGoal.LeftHand, 1f);
-            anim.SetIKRotation(AvatarIKGoal.LeftHand, LT.rotation);
+            anim.SetBoneLocalRotation(HumanBodyBones.LeftHand,LT.localRotation);
+            //anim.SetIKRotation(AvatarIKGoal.LeftHand, LT.rotation);
             anim.SetIKPositionWeight(AvatarIKGoal.LeftHand, 1f);
             anim.SetIKPosition(AvatarIKGoal.LeftHand, LT.position);
 
@@ -140,6 +143,9 @@ public class CharacterSpineRotate : SpineRotate
     }
 
     public AnimationCurve upperWheelRatio;
+    public Vector3 max = new Vector3(0.05f,0.085f,-0.115f);
+    public Vector3 center = new Vector3(0.05f,-0.05f,0.07f);
+    public Vector3 min = new Vector3(0,0.4f,0.45f);
     public override void ModelUpdate()
     {
         // 0 ~ 1의 값으로 평균화하기
@@ -147,6 +153,11 @@ public class CharacterSpineRotate : SpineRotate
         Debug.Log(nomalizedRatio);
         fast.TransformRotate(nomalizedRatio); 
         spineConstraint.weight = upperWheelRatio.Evaluate(nomalizedRatio);
+
+        if (nomalizedRatio > 0.5f)
+        { CamPivot.transform.localPosition = Vector3.Lerp(center, max, (nomalizedRatio - 0.5f) * 2f); }
+        else
+        { CamPivot.transform.localPosition = Vector3.Lerp(min, center, nomalizedRatio * 2f); }
         
         
     }
