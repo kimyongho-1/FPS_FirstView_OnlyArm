@@ -16,7 +16,9 @@ public class IK_fORRecording : MonoBehaviour
         RightHand.anim = anim;
     }
     private void OnAnimatorIK(int layerIndex)
-    {  // Fingers
+    {
+        return;
+        // Fingers
         if (TurnFingerIK == true)
         {
             LeftHand.Grap();
