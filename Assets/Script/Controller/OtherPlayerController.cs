@@ -45,9 +45,9 @@ public class OtherPlayerController : MyBaseController
         if (Physics.Raycast(GetColliderCenterInWS(), Vector3.down, out RaycastHit hit, height + CapsuleData.rayLength, GetGroundMask()))
         {
             IsGround = true;
-            slopedAngle = CapsuleData.slopeCurve.Evaluate(Vector3.Angle(Vector3.up, hit.normal));
-            //Debug.Log(slopedAngle);
-            if (slopedAngle < 0)
+            slopedSpeed = CapsuleData.slopeCurve.Evaluate(Vector3.Angle(Vector3.up, hit.normal));
+            //Debug.Log(slopedSpeed);
+            if (slopedSpeed < 0)
             {
                 // 오른손 법칙을 이용해서 월드상 업벡터와 노말방향과 외적하여 현재 hit오브젝트의 right축 구하기
                 Vector3 slopeRight = Vector3.Cross(Vector3.up, hit.normal);
@@ -67,7 +67,7 @@ public class OtherPlayerController : MyBaseController
       
             return upwards;
         }
-        slopedAngle = 1f;
+        slopedSpeed = 1f;
         // 밑에 지면감지 못할경우, 땅에 착지 상태가 아님을 확인 및 중력 적용
         // 이전 속력을 유지하면서 새로운 중력을 더하여 점점 더 빠르게 낙하하도록 유도
         IsGround = false;

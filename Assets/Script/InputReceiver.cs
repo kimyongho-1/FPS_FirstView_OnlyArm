@@ -12,19 +12,18 @@ public class InputReceiver : MonoBehaviour
     public Transform Look, YawRotator, PitchRotator;
     public float gravityAmount = 4f; // 고정을 유지
     public float gravityForce = 1f; // 변경 가능
-    
-    
+    public float animationSmoothTime = 0.1f;
     public float mouseX { get { return userInputData.mouseX; } }
     public float mouseY { get { return userInputData.mouseY; } }
     public Vector3 movement;
+    public Vector2 dir;
     public void MovementInput(float speed)
     {
-        // 속력 초기화
-        movement = Vector3.zero;
         // 키입력
-        float forwward = Input.GetAxis("Vertical");
-        float side = Input.GetAxis("Horizontal");
-        movement += (YawRotator.forward * forwward + YawRotator.right * side).normalized * speed ;
+        dir.y = Input.GetAxis("Vertical");
+        dir.x = Input.GetAxis("Horizontal");
+        // 속력 초기화
+        movement = (YawRotator.forward * dir.y + YawRotator.right * dir.x).normalized * speed;
     }
     public void DirectionInput()
     {

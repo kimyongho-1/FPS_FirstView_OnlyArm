@@ -1,21 +1,45 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem.LowLevel;
 
 public class StandIdleState : BaseStandState
 {
     public StandIdleState(MyBaseController owner) : base(owner) { }
-
+   
     public override void Enter()
     {
         base.Enter();
         Owner.RB.velocity = Vector3.zero;
+        StateEvt -= TransitionToIdleQuickly;
+        StateEvt += TransitionToIdleQuickly;
+    }
 
-        Owner.FullBodyModel.CrossFadeInFixedTime("Rifle Aiming Idle", 0.1f, 0);
+    // Idle로 전환시, 빠르게 파라미터값 수정 (현재 2배로)
+    public void TransitionToIdleQuickly() 
+    {
+        // 애니메이션 파라미터 업데이트를 위한 스무딩 적용
+        float currentX = Owner.FullBodyModel.GetFloat("X");
+        float newX = Mathf.Lerp(currentX, 0, Owner.myInput.animationSmoothTime * 2f);
+        float currentZ = Owner.FullBodyModel.GetFloat("Z");
+        float newZ = Mathf.Lerp(currentZ, 0, Owner.myInput.animationSmoothTime * 2f);
+
+        if (Mathf.Abs(newX) < 0.1f && Mathf.Abs(newZ) < 0.1f)
+        {
+            newX = newZ = 0;
+            StateEvt -= TransitionToIdleQuickly;
+        }
+        Owner.FullBodyModel.SetFloat("X", newX);
+        Owner.FullBodyModel.SetFloat("Z", newZ);
+        // 총기 업데이트
+        Owner.GunModel.SetFloat("X", newX);
+        Owner.GunModel.SetFloat("Z", newZ);
+
     }
 
     public override void Exit()
     {
+        StateEvt -= TransitionToIdleQuickly;
         #region 제자리 회전 애니메이션 강제중지
         // 현재 제자리에서 타겟방향을 바라보도록 회전하는 애니메이션 실행중일경우
         // 빈 클립을 재생시켜
@@ -33,17 +57,18 @@ public class StandIdleState : BaseStandState
         base.Update();
 
         // 입력처리에 따른 모델 애니메이션 업데이트
-        ModelUpdate();
+        AnimatorUpdate();
 
-        if (Owner.myInput.movement != Vector3.zero) 
+        if (Owner.myInput.dir != Vector2.zero) 
         {
             Owner.StateMachine.ChangeState(Owner.StateMachine.StandWalkState);
             return;
         }
     }
-    public override void ModelUpdate()
+    public override void AnimatorUpdate()
     {
-        base.ModelUpdate();
+        StateEvt?.Invoke();
+
         if (Owner.FullBodyModel.GetBool("PelvisRotating") == false)
         {
             // 회전 애니메이션 레이어의 가중치는
@@ -51,9 +76,9 @@ public class StandIdleState : BaseStandState
             float angle = Vector3.SignedAngle(Owner.FullBodyModel.transform.forward, Owner.myInput.YawRotator.forward, Vector3.up);
        
             if (angle > 45f)
-            { Owner.FullBodyModel.PlayInFixedTime("RightRotate", 1); }
-            else if (angle < -35f)
-            { Owner.FullBodyModel.PlayInFixedTime("LeftRotate", 1); }
+            { Owner.FullBodyModel.PlayInFixedTime("RightRotatePose", 1); }
+            else if (angle < -45f)
+            { Owner.FullBodyModel.PlayInFixedTime("LeftRotatePose", 1); }
         }
     }
 }

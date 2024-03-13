@@ -8,6 +8,6 @@ public interface ICState
     public void Exit();
     public void FixedUpdate();
     public void Update();
-    public void ModelUpdate();
+    public void AnimatorUpdate();
 
 }

@@ -8,7 +8,7 @@ public class StandWalkState : BaseStandState
     public override void Enter()
     {
         base.Enter();
-        Owner.FullBodyModel.CrossFadeInFixedTime("Walk Forward", 0.1f, 0);
+        //Owner.FullBodyModel.CrossFadeInFixedTime("Walk Forward", 0.1f, 0);
     }
 
     public override void Exit()
@@ -24,9 +24,9 @@ public class StandWalkState : BaseStandState
     public override void Update()
     {
         base.Update();
-        ModelUpdate();
+        AnimatorUpdate();
 
-        if (Owner.myInput.movement == Vector3.zero)
+        if (Owner.myInput.dir == Vector2.zero)
         {
             Owner.StateMachine.ChangeState(Owner.StateMachine.StandIdleState);
             return;
@@ -38,8 +38,10 @@ public class StandWalkState : BaseStandState
             return;
         }
     }
-    public override void ModelUpdate()
+    public override void AnimatorUpdate()
     {
-        Owner.FullBodyModel.transform.rotation = Owner.myInput.YawRotator.localRotation;
+        // 전신 캐릭터 애니메이터 업데이트
+        base.AnimatorUpdate();
+      
     }
 }

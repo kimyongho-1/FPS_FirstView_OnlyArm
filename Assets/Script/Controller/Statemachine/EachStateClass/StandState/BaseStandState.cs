@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,6 +6,7 @@ using UnityEngine;
 public class BaseStandState : ICState
 {
     protected float standSpeed = 1f;
+    protected Action StateEvt = null;
 
     public BaseStandState(MyBaseController owner)
     { Owner = owner; }
@@ -24,8 +26,8 @@ public class BaseStandState : ICState
     {
         Vector3 ups = Owner.GroundCheck();
 
-        // 공중속력 계산 (중력 또는 상승)
-        if (Owner.slopedAngle > 0)
+        // 경사로 속도보정이 1이란건, 경사로 문제가 없는경우 => 중력 또는 이동속도 적용
+        if (Owner.slopedSpeed == 1 )
         {
             Vector3 exVelocity = new Vector3(Owner.RB.velocity.x, 0, Owner.RB.velocity.z);
             Vector3 moveForce = Owner.myInput.movement - exVelocity;
@@ -37,9 +39,11 @@ public class BaseStandState : ICState
         {
             // 지면 착지 상태라면, 경사면을 타고 내려가도록 유도 (이전 속력은 현재에서 뺴주기 : 너무 빠른 낙하 방지)
             if (Owner.IsGround)
-            { Owner.RB.AddForce((ups * -Owner.slopedAngle) - new Vector3(0, Owner.RB.velocity.y, 0), ForceMode.VelocityChange) ; }
+            {
+                Owner.RB.AddForce((ups * Owner.slopedSpeed) - new Vector3(0, Owner.RB.velocity.y, 0), ForceMode.VelocityChange) ; 
+            }
 
-            // 공중에 떠있으면, 중력을 중복 적용시키는 목적으로 이전 속력에서 더하기
+            // 공중에 떠있으면, 중력을 중복 적용시키는 목적으로 이전 속력에서 더하기 (점점 빠르게 떨어지도록 유도)
             else
             { Owner.RB.AddForce(ups, ForceMode.VelocityChange);}
         }
@@ -51,9 +55,24 @@ public class BaseStandState : ICState
         Owner.myInput.MovementInput(standSpeed);
 
     }
-    public virtual void ModelUpdate()
+    public virtual void AnimatorUpdate()
     {
-        Owner.SR.ModelUpdate();
+        // 애니메이션 파라미터 업데이트를 위한 스무딩 적용
+        float currentX = Owner.FullBodyModel.GetFloat("X");
+        float newX = Mathf.Lerp(currentX, Owner.myInput.dir.x, Owner.myInput.animationSmoothTime);
+
+        float currentZ = Owner.FullBodyModel.GetFloat("Z");
+        
+        float newZ = Mathf.Lerp(currentZ, Owner.myInput.dir.y, Owner.myInput.animationSmoothTime);
+       
+        Owner.FullBodyModel.SetFloat("X", newX);
+        Owner.FullBodyModel.SetFloat("Z", newZ);
+        // 총기 업데이트
+        Owner.GunModel.SetFloat("X", newX);
+        Owner.GunModel.SetFloat("Z", newZ);
+
+        // 방향 동기화
+        Owner.FullBodyModel.transform.rotation = Owner.myInput.YawRotator.localRotation;
     }
- 
+
 }

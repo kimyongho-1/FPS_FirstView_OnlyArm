@@ -7,10 +7,10 @@ public abstract class MyBaseController : MonoBehaviour
     [HideInInspector] public SpineRotate SR;
     public SMB_Character StateMachine;
     [HideInInspector] public Rigidbody RB;
-    public Animator FullBodyModel { get; set; }
+    public Animator FullBodyModel, GunModel, ArmModel;
     [HideInInspector] public InputReceiver myInput;
     public bool IsGround;
-    public float slopedAngle;
+    public float slopedSpeed;
     public virtual void Awake()
     {
         RB = GetComponent<Rigidbody>();
