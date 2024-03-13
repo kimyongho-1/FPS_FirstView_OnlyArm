@@ -47,6 +47,7 @@ public class MyPlayerController : MyBaseController
             IsGround = true;
             slopedSpeed = CapsuleData.slopeCurve.Evaluate(Vector3.Angle(Vector3.up, hit.normal));
             
+            // 지면 가속도가 1이상이란건, 이동불가능한 경사로면 위에 있음을 의미
             if (slopedSpeed > 1)
             {
                 Debug.DrawRay(hit.point, hit.normal * 10f, Color.red);
@@ -61,6 +62,7 @@ public class MyPlayerController : MyBaseController
                 return slideDirection;
             }
 
+            // 지면에 맞게 캡슐이 떠있어야할 거리차 구하기
             float groundDist = height - ((GetColliderCenterInWS().y) - hit.point.y);
 
             // 지면과의 거리 차이값을 deltatime만큼
@@ -78,12 +80,12 @@ public class MyPlayerController : MyBaseController
 
     private void Update()
     {
+        if (Input.GetMouseButtonDown(1)) { CamPivot.handCamAnim.SetTrigger("RC"); }
         // 입력 실행
         StateMachine.CurrState.Update();
 
-        // 카메라 피봇 회전 실행
+        // 카메라+무기루트 피봇 회전 실행
         CamPivot.Rotate(myInput.pitchVal);
-
         // 애니메티어 업데이트
         StateMachine.CurrState.AnimatorUpdate();
 

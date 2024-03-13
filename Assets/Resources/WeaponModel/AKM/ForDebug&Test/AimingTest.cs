@@ -8,7 +8,11 @@ public class AimingTest : MonoBehaviour
 
     public void Update()
     {
-      
+        if (Physics.Raycast(CAM.transform.position, CAM.transform.forward, out RaycastHit hit,10f))
+        {
+            transform.LookAt(hit.point);
+        }
+        
     }
 
     private void OnDrawGizmos()

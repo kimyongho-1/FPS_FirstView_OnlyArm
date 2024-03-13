@@ -17,6 +17,8 @@ public class InputReceiver : MonoBehaviour
     public float mouseY { get { return userInputData.mouseY; } }
     public Vector3 movement;
     public Vector2 dir;
+    public Vector2 mouseDir;
+    public float rotSpeedLimit;
     public void MovementInput(float speed)
     {
         // Å°ÀÔ·Â
@@ -27,13 +29,14 @@ public class InputReceiver : MonoBehaviour
     }
     public void DirectionInput()
     {
-        yawVal += Input.GetAxis("Mouse X") * mouseX * Time.deltaTime;
-        pitchVal = Mathf.Clamp(pitchVal - Input.GetAxis("Mouse Y") * mouseY * Time.deltaTime, -85f, 85f);
-
+        mouseDir.x = Mathf.Clamp(Input.GetAxis("Mouse X") * mouseX, -rotSpeedLimit, rotSpeedLimit);
+        mouseDir.y = Mathf.Clamp(Input.GetAxis("Mouse Y") * mouseY ,-rotSpeedLimit, rotSpeedLimit);
+        yawVal += mouseDir.x * Time.deltaTime;
         yawVal = Mathf.Repeat(yawVal, 360f);
-        pitchVal = Mathf.Clamp(pitchVal, pitchAngle.x, pitchAngle.y);
+        pitchVal = Mathf.Clamp(pitchVal - mouseDir.y * Time.deltaTime, pitchAngle.x, pitchAngle.y);
 
-        YawRotator.localRotation = Quaternion.Euler(Vector3.up * yawVal);
-        PitchRotator.localRotation = Quaternion.Euler(Vector3.right * pitchVal);
+        YawRotator.localRotation = Quaternion.AngleAxis(yawVal, Vector3.up);
+        PitchRotator.localRotation = Quaternion.AngleAxis( pitchVal, Vector3.right);
     }
+
 }
