@@ -4,7 +4,8 @@ using UnityEngine;
 
 public static class Utill
 {
-   
+    public enum GunType
+    { AK}
     
 }
 public static class AnimLayer

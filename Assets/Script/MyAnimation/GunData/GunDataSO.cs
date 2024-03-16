@@ -4,6 +4,10 @@ using UnityEngine;
 
 public class GunDataSO : ScriptableObject
 {
+    public Vector3 spread = new Vector3(0.1f, 0.1f, 0.1f);
+    public float fireRate = 0.1f;
+
+    [Header("Obsolete 아래것들")]
     public List<eachFinger> LeftFingers = new List<eachFinger>();
     public List<eachFinger> RightFingers = new List<eachFinger>();
 

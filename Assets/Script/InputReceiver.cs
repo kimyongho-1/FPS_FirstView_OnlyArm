@@ -29,11 +29,11 @@ public class InputReceiver : MonoBehaviour
     }
     public void DirectionInput()
     {
-        mouseDir.x = Mathf.Clamp(Input.GetAxis("Mouse X") * mouseX, -rotSpeedLimit, rotSpeedLimit);
-        mouseDir.y = Mathf.Clamp(Input.GetAxis("Mouse Y") * mouseY ,-rotSpeedLimit, rotSpeedLimit);
-        yawVal += mouseDir.x * Time.deltaTime;
+        mouseDir.x = Input.GetAxis("Mouse X");// Mathf.Clamp(Input.GetAxis("Mouse X") * mouseX, -rotSpeedLimit, rotSpeedLimit);
+        mouseDir.y = Input.GetAxis("Mouse Y");// Mathf.Clamp(Input.GetAxis("Mouse Y") * mouseY ,-rotSpeedLimit, rotSpeedLimit);
+        yawVal += mouseDir.x * mouseX * Time.deltaTime;
         yawVal = Mathf.Repeat(yawVal, 360f);
-        pitchVal = Mathf.Clamp(pitchVal - mouseDir.y * Time.deltaTime, pitchAngle.x, pitchAngle.y);
+        pitchVal = Mathf.Clamp(pitchVal - (mouseDir.y * mouseY * Time.deltaTime), pitchAngle.x, pitchAngle.y);
 
         YawRotator.localRotation = Quaternion.AngleAxis(yawVal, Vector3.up);
         PitchRotator.localRotation = Quaternion.AngleAxis( pitchVal, Vector3.right);
