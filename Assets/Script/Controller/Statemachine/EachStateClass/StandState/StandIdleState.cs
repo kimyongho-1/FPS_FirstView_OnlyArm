@@ -18,22 +18,22 @@ public class StandIdleState : BaseStandState
     // Idle로 전환시, 빠르게 파라미터값 수정 (현재 2배로)
     public void TransitionToIdleQuickly() 
     {
-        // 애니메이션 파라미터 업데이트를 위한 스무딩 적용
-        float currentX = Owner.FullBodyModel.GetFloat("X");
-        float newX = Mathf.Lerp(currentX, 0, Owner.myInput.animationSmoothTime * 2f);
-        float currentZ = Owner.FullBodyModel.GetFloat("Z");
-        float newZ = Mathf.Lerp(currentZ, 0, Owner.myInput.animationSmoothTime * 2f);
-
-        if (Mathf.Abs(newX) < 0.1f && Mathf.Abs(newZ) < 0.1f)
-        {
-            newX = newZ = 0;
-            StateEvt -= TransitionToIdleQuickly;
-        }
-        Owner.FullBodyModel.SetFloat("X", newX);
-        Owner.FullBodyModel.SetFloat("Z", newZ);
-        // 총기 업데이트
-        Owner.GunModel.SetFloat("X", newX);
-        Owner.GunModel.SetFloat("Z", newZ);
+     //  // 애니메이션 파라미터 업데이트를 위한 스무딩 적용
+       float currentX = Owner.FullBodyModel.GetFloat("X");
+       float newX = Mathf.Lerp(currentX, 0, Owner.myInput.animationSmoothTime * 2f);
+       float currentZ = Owner.FullBodyModel.GetFloat("Z");
+       float newZ = Mathf.Lerp(currentZ, 0, Owner.myInput.animationSmoothTime * 2f);
+     
+       if (Mathf.Abs(newX) < 0.1f && Mathf.Abs(newZ) < 0.1f)
+       {
+           newX = newZ = 0;
+           StateEvt -= TransitionToIdleQuickly;
+       }
+       Owner.FullBodyModel.SetFloat("X", newX);
+       Owner.FullBodyModel.SetFloat("Z", newZ);
+       // 총기 업데이트
+       Owner.GunModel.SetFloat("X", newX);
+       Owner.GunModel.SetFloat("Z", newZ);
 
     }
 

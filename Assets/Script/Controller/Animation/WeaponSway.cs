@@ -1,87 +1,96 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
-
-public enum process
-{ Idle, StartSway, Swaying, StartRewind, EndRewind }
 
 public class WeaponSway : MonoBehaviour
 {
+
     public MyPlayerController pc;
-    public process curr;
-    public float requierdSwayAmount;
-    public AnimationCurve speedChangeSection;
-    [Header("좌우 흔들림")]
-    public AnimationCurve xPos, yRot, zRot;
-    [Header("상하 흔들림")]
-    public AnimationCurve yPos, xRot;
-    float tickX, tickY, tick;
-    public Vector2 exDir;
-    public float speedFactor;
-    float deltaInput;
-    public int Operator, exOperator;
-
-    Quaternion startRot, EndRot;
-    private void Awake()
+   
+    public AnimationCurve xPos, yPos;
+    Vector3 input, velocity, destValue ,destRot;
+    /// <summary>
+    ///zeta : 감쇠비, 감쇠비가 0이면 감쇠안하며,
+    ///       감쇠비가 0 : 무한하게 진동하는 상태
+    ///       0 ~ 1 사이 저감쇠 : 목표값으로 수렴하지만 진동의 크기는 시간이 지남에 따라 기하급수적으로 감소
+    ///       1 임계감쇠 : 시스템이 진동없이 가장 빠르게 목표값으로 고정되는 현상 (목표값에 도달하기 위해 필요한 최소시간으로 수렴하는 비)
+    ///       1 초과 과감쇠 : 임계감쇠보다 느리게 목표값으로 수렴, 감쇠비가 증가함에 따라 목표값으로 도달하는 속도가 느려진다
+    ///                     스프링 효과보다는 드래그(저항)효과가 더 강해지는 성질을 지님.</summary>
+    [Range(0, 1.5f)] public float zeta;
+    public float Frequency = 1f;
+    public float curveRatioX,curveRatioY = 0;
+    Vector2 exMag;
+    public void Update()
     {
-        //Debug.Log($"내적 : { Vector2.Dot(input, exDir)}");
-        curr = process.Idle;
+        float deltaTime = Time.deltaTime;
+        float Omega = Mathf.PI * Frequency;
+        // 2파이 주기를 1초에 걸쳐서 하나의 전체주기
+        // Frequency를 통해 주기를 올려 속도를 증감시키기
+
+        Vector2 currDir = pc.myInput.mouseDir;
+        float xDir = 1f;  float yDir = 1f;
+        if (currDir.x > 0)  { xDir = -1; }
+        if (currDir.y > 0) { yDir = -1; }
+
+        float xMag = currDir.x - exMag.x;
+        if (xMag < 1f) { curveRatioX = Mathf.Lerp(curveRatioX, 0, 0.25f);  } // 조준 모드일떄는 mag < 2~3으로 증가 시켜주자
+        else if (xMag < 3f) { curveRatioX = Mathf.Lerp(curveRatioX, 0.75f, 0.75f); } // 마찬가지
+        else { curveRatioX = Mathf.Lerp(curveRatioX, 1, 0.95f);  }
+
+
+        float yMag = currDir.y - exMag.y;
+        if (yMag < 1f) { curveRatioY = Mathf.Lerp(curveRatioY, 0, 0.25f);  } // 조준 모드일떄는 mag < 2~3으로 증가 시켜주자
+        else if (yMag < 3f) { curveRatioY = Mathf.Lerp(curveRatioY, 0.75f, 0.75f); } // 마찬가지
+        else { curveRatioY = Mathf.Lerp(curveRatioY, 1, 0.95f); }
+
+        destValue = new Vector3(xDir * xPos.Evaluate(curveRatioX), yDir * yPos.Evaluate(curveRatioY), 0);
+        exMag = currDir;
+        SimpleSpring(Omega, deltaTime);
+        //ImplictEulerSpring(Omega, deltaTime);
+
     }
-    private void Update()
+    /// <summary>
+    /// 단순한 계산의 수치 스프링
+    /// 단순함 | 오류수정 존재할수도 (허나 지금 제타같은 변수가 한계가 정해져있어서 사용해도 무방할듯)
+    /// </summary>
+    /// <param name="Omega"></param>
+    public void SimpleSpring(float Omega, float deltaTime)
     {
-        Vector2 input = pc.myInput.mouseDir;
-        float inputMagnitude = input.sqrMagnitude; // 마우스 입력 크기
+        Vector3 preCalcul = -2.0f * deltaTime * zeta * Omega * velocity;
 
-        // deltaInput = Mathf.Abs(input.x) - Mathf.Abs(exDir.x);
-        float swayStartPoint = (exDir == default) ? 1f * speedFactor : (requierdSwayAmount * requierdSwayAmount);
+        velocity += preCalcul + deltaTime * Omega * Omega * (destValue - input);
+        input += deltaTime * velocity;
+        transform.localPosition = input;
+        destRot += deltaTime * velocity;
+        // 마우스입력이 작으면 무시 (단 회전이 진행중이라면)
+        // 크면 추가 회전량 입력
+        // 아무런 입력이 없으면? => 0도로 원복 시도 (Lerp함수 사용)
+        transform.localRotation = Quaternion.Euler(destRot.y * destRotMultiplyX,0, destRot.x * destRotMultiplyY);
 
-        Debug.Log($"첫 회전 시작 : {(exDir == default)}");
-        // 마우스 입력이 있을 때 (최소 요구 달성)
-        if (inputMagnitude > swayStartPoint)//swayStartPoint
-        {
-            // 이전 프레임과 현재 프레임간 입력 차이를 계산 : 변화량에 따라 tick 값 조절
-            deltaInput = Mathf.Abs(input.x) - Mathf.Abs(exDir.x);
-            float speed = speedChangeSection.Evaluate(deltaInput);
+    }
+    public float destRotMultiplyX,destRotMultiplyY = 15f;
+    /// <summary>
+    /// 암시적오일러 수치 스프링
+    /// 복잡함 | 정밀한 결과 + 제타같은 수치안정성
+    /// </summary>
+    /// <param name="Omega"></param>
+    public void ImplictEulerSpring(float Omega, float deltaTime)
+    {
+        float f = (1 + 2 * deltaTime * zeta * Omega);
+        float dDelta = deltaTime * deltaTime;
+        float dOmega = (Omega * Omega);
+        float Delta = 1.0f / (f + dDelta * dOmega);
 
-            Operator = (input.x < 0) ? 1 : -1;
-            if (Operator != exOperator) // 반대 방향이라면
-            {
-                  // tick 증감
-                tick = tick - Time.deltaTime * speedFactor;
-            }
-            else
-            {
-                // tick 증감
-                tick = tick + Time.deltaTime * speed;
-            }
-            
-            exOperator = Operator;
-        }
-        else
-        {
-            // 마우스 입력이 없을 때 tick을 감소
-            tick -= Time.deltaTime *speedFactor ;
-        }
-        tick = Mathf.Clamp01(tick);
-        // Lerp로 보간하여 부드럽게 보이도록 만들기
-        float lerpRatio = (tick > 1f) ? 1f : 0.85f;
-        transform.localPosition =
-            Vector3.Lerp(
-                transform.localPosition
-                , new Vector3(Operator*xPos.Evaluate(tick),0, 0)
-                , lerpRatio
-                );
-        transform.localRotation =
-            Quaternion.Slerp(
-                transform.localRotation
-                , Quaternion.Euler(0, Operator * yRot.Evaluate(tick), Operator * zRot.Evaluate(tick))
-                , lerpRatio
-                );
+        Vector3 DeltaVelo = velocity + deltaTime * dOmega * (destValue - input);
+        velocity = DeltaVelo * Delta;
+        Vector3 DeltaInput = f * input + deltaTime * velocity + dDelta * dOmega * destValue;
+        input = DeltaInput * Delta;
 
-        exDir = Vector2.Lerp(exDir, input, Time.deltaTime * speedFactor); // 현재 프레임을 보간하여 저장
-        if (tick == 0 && input.x == 0)
-        {
-            exDir = default;
-        }
+        transform.localPosition = input;
+
+        Vector3 DeltaRot = f * destRot + deltaTime * velocity + dDelta * dOmega * destValue;
+        destRot = DeltaRot * Delta;
+        transform.localRotation = Quaternion.Euler(destRot.y * destRotMultiplyX, 0, destRot.x * destRotMultiplyY);
     }
 }

@@ -22,5 +22,6 @@ public class StandRunState : BaseStandState
 
     public override void Update()
     {
+        Owner.GunModel.SetBool("HoldBreath", false);
     }
 }

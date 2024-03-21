@@ -24,7 +24,7 @@ public class SpineRotate0224 : MonoBehaviour
     public void Init(MyBaseController p, InputReceiver pi)
     {
         anim = GetComponent<Animator>();
-        p.FullBodyModel = anim;
+     //   p.FullBodyModel = anim;
         PC = p;
         myInput = pi;
 

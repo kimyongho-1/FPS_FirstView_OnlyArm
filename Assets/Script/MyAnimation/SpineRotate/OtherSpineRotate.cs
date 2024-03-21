@@ -118,7 +118,7 @@ public class OtherSpineRotate : SpineRotate
     public override void Init(MyBaseController p, InputReceiver pi)
     {
         anim = GetComponent<Animator>();
-        p.FullBodyModel = anim;
+       // p.FullBodyModel = anim;
         PC = p;
         myInput = pi;
 

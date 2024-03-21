@@ -126,7 +126,7 @@ public class CharacterSpineRotate : SpineRotate
     {
         anim = GetComponent<Animator>();
         ArmModel = fast.GetComponent<Animator>();
-        p.FullBodyModel = anim;
+      //  p.FullBodyModel = anim;
         PC = p;
         myInput = pi;
 

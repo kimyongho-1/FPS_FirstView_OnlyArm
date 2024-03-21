@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class CamPivotSpring : MonoBehaviour
 {
-    public Animator handCamAnim;
+    public WeaponSway weaponSway;
     public Vector3 Down = new Vector3(0, 0.5f, 0.5f);
     public Vector3 Up = new Vector3(0, 0.2f, 0);
     public void Rotate(float pitch)

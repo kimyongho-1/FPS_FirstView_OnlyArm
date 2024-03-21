@@ -8,7 +8,7 @@ public class StandWalkState : BaseStandState
     public override void Enter()
     {
         base.Enter();
-        //Owner.FullBodyModel.CrossFadeInFixedTime("Walk Forward", 0.1f, 0);
+        Owner.GunModel.SetBool("HoldBreath",false);
     }
 
     public override void Exit()
@@ -26,6 +26,7 @@ public class StandWalkState : BaseStandState
         base.Update();
         AnimatorUpdate();
 
+        Owner.GunModel.SetBool("HoldBreath", false);
         if (Owner.myInput.dir == Vector2.zero)
         {
             Owner.StateMachine.ChangeState(Owner.StateMachine.StandIdleState);

@@ -80,7 +80,24 @@ public class MyPlayerController : MyBaseController
 
     private void Update()
     {
-        if (Input.GetMouseButtonDown(1)) { CamPivot.handCamAnim.SetTrigger("RC"); }
+        bool clickedAiming = Input.GetMouseButton(1);
+        
+        // 우클릭시 조준모드로 전환 (Lerp로 실행)
+        GunModel.Lerp(clickedAiming);
+        if (clickedAiming )
+        {
+            CamPivot.weaponSway.zeta = 0.45f;
+            CamPivot.weaponSway.Frequency = 2.5f;
+            if (Input.GetKeyDown(KeyCode.LeftAlt))
+            { GunModel.SetBool("HoldBreath", !GunModel.GetBool("HoldBreath")) ; }
+        }
+        else
+        {
+            CamPivot.weaponSway.zeta = 0.65f;
+            CamPivot.weaponSway.Frequency = 4f;
+            GunModel.SetBool("HoldBreath", false); 
+        }
+        //GunModel.SetBool("HoldBreath", true);//
         // 입력 실행
         StateMachine.CurrState.Update();
 
