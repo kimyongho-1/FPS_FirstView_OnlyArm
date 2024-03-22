@@ -22,4 +22,6 @@ public abstract class MyBaseController : MonoBehaviour
     public Transform YawRotator { get { return myInput.YawRotator; } }
     public Transform PitchRotator { get { return myInput.PitchRotator; } }
 
+    public abstract void CheckAimingAndBreath();
+
 }

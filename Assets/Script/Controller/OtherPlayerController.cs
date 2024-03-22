@@ -87,4 +87,5 @@ public class OtherPlayerController : MyBaseController
     }
 
 
+    public override void CheckAimingAndBreath() { }
 }

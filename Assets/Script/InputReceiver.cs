@@ -6,7 +6,7 @@ public class InputReceiver : MonoBehaviour
 {
     public UserConfigureData userInputData; // 사용자가 수정가능한 데이터영역
 
-    
+    public float walkSpeed, runSpeed;
     public float pitchVal, yawVal;
     public Vector2 pitchAngle;
     public Transform Look, YawRotator, PitchRotator;

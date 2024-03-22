@@ -23,17 +23,17 @@ public class StandWalkState : BaseStandState
 
     public override void Update()
     {
-        base.Update();
+        base.Update(); 
+        Owner.myInput.MovementInput(Owner.myInput.walkSpeed);
         AnimatorUpdate();
 
-        Owner.GunModel.SetBool("HoldBreath", false);
         if (Owner.myInput.dir == Vector2.zero)
         {
             Owner.StateMachine.ChangeState(Owner.StateMachine.StandIdleState);
             return;
         }
 
-        if (Input.GetKey(KeyCode.LeftShift))
+        if (IsRunning)
         {
             Owner.StateMachine.ChangeState(Owner.StateMachine.StandRunState);
             return;

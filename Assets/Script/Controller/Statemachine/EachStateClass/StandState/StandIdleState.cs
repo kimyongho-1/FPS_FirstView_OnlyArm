@@ -20,9 +20,9 @@ public class StandIdleState : BaseStandState
     {
      //  // 애니메이션 파라미터 업데이트를 위한 스무딩 적용
        float currentX = Owner.FullBodyModel.GetFloat("X");
-       float newX = Mathf.Lerp(currentX, 0, Owner.myInput.animationSmoothTime * 2f);
+       float newX = Mathf.Lerp(currentX, 0, Owner.myInput.animationSmoothTime * 5f);
        float currentZ = Owner.FullBodyModel.GetFloat("Z");
-       float newZ = Mathf.Lerp(currentZ, 0, Owner.myInput.animationSmoothTime * 2f);
+       float newZ = Mathf.Lerp(currentZ, 0, Owner.myInput.animationSmoothTime * 5f);
      
        if (Mathf.Abs(newX) < 0.1f && Mathf.Abs(newZ) < 0.1f)
        {
@@ -46,6 +46,7 @@ public class StandIdleState : BaseStandState
         // 회전 애니메이션과 애니메이션TurnRotate스크립트 실행중지 시키기
         Owner.FullBodyModel.Play("Null",1);
         #endregion
+        Owner.GunModel.SetBool("HoldBreath", false);
     }
 
     public override void FixedUpdate()
@@ -55,12 +56,23 @@ public class StandIdleState : BaseStandState
     public override void Update()
     {
         base.Update();
+        Owner.myInput.MovementInput(Owner.myInput.walkSpeed);
+
+        // 조준+호흡 상태변경 확인
+        Owner.CheckAimingAndBreath();
 
         // 입력처리에 따른 모델 애니메이션 업데이트
         AnimatorUpdate();
 
+        // 이동 입력 확인
         if (Owner.myInput.dir != Vector2.zero) 
         {
+            if (IsRunning)
+            {
+                Owner.StateMachine.ChangeState(Owner.StateMachine.StandRunState);
+                return;
+            }
+
             Owner.StateMachine.ChangeState(Owner.StateMachine.StandWalkState);
             return;
         }

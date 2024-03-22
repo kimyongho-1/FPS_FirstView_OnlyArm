@@ -1,13 +1,18 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using TMPro;
 public class MyPlayerController : MyBaseController
 {
+    #region
+    public TextMeshProUGUI stateNameViewer;
+    #endregion
+
     public CamPivotSpring CamPivot;
     public MyCapsuleData CapsuleData;
     public Vector3 GetColliderCenterInWS()
     { return CapsuleData.collider.bounds.center; }
+   
     public LayerMask GetGroundMask() { return CapsuleData.groundMask; }
 
     public override void Awake()
@@ -78,26 +83,28 @@ public class MyPlayerController : MyBaseController
         return Vector3.up * (myInput.gravityAmount * Time.fixedDeltaTime * myInput.gravityForce);
     }
 
-    private void Update()
+    public override void CheckAimingAndBreath()
     {
         bool clickedAiming = Input.GetMouseButton(1);
-        
+
         // 우클릭시 조준모드로 전환 (Lerp로 실행)
         GunModel.Lerp(clickedAiming);
-        if (clickedAiming )
+        if (clickedAiming)
         {
             CamPivot.weaponSway.zeta = 0.45f;
             CamPivot.weaponSway.Frequency = 2.5f;
             if (Input.GetKeyDown(KeyCode.LeftAlt))
-            { GunModel.SetBool("HoldBreath", !GunModel.GetBool("HoldBreath")) ; }
+            { GunModel.SetBool("HoldBreath", !GunModel.GetBool("HoldBreath")); }
         }
         else
         {
             CamPivot.weaponSway.zeta = 0.65f;
             CamPivot.weaponSway.Frequency = 4f;
-            GunModel.SetBool("HoldBreath", false); 
+            GunModel.SetBool("HoldBreath", false);
         }
-        //GunModel.SetBool("HoldBreath", true);//
+    }
+    private void Update()
+    {
         // 입력 실행
         StateMachine.CurrState.Update();
 
@@ -106,6 +113,9 @@ public class MyPlayerController : MyBaseController
         // 애니메티어 업데이트
         StateMachine.CurrState.AnimatorUpdate();
 
+
+        // 디버기용도
+        stateNameViewer.text = $"{StateMachine.CurrState.ToString()}";
     }
     private void FixedUpdate()
     {

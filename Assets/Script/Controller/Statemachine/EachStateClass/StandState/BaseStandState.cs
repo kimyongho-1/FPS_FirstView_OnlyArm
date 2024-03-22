@@ -5,13 +5,15 @@ using UnityEngine;
 
 public class BaseStandState : ICState
 {
-    protected float standSpeed = 1f;
     protected Action StateEvt = null;
 
     public BaseStandState(MyBaseController owner)
     { Owner = owner; }
 
     public MyBaseController Owner;
+
+    public bool IsRunning 
+    { get { return (Owner.myInput.dir.y > 0  && Input.GetKey(KeyCode.LeftShift)) ; } }
     public virtual void Enter()
     {
         Debug.Log($"{GetType().Name} is Enter");
@@ -52,8 +54,6 @@ public class BaseStandState : ICState
     public virtual void Update()
     {
         Owner.myInput.DirectionInput();
-        Owner.myInput.MovementInput(standSpeed);
-
     }
     public virtual void AnimatorUpdate()
     {
