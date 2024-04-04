@@ -9,6 +9,8 @@
     "com.unity.ide.vscode": "1.2.5",
     "com.unity.inputsystem": "1.6.3",
     "com.unity.memoryprofiler": "1.0.0",
+    "com.unity.meshsync": "https://github.com/unity3d-jp/MeshSync.git",
+    "com.unity.meshsync.dcc-plugins": "0.17.1-preview",
     "com.unity.probuilder": "5.1.1",
     "com.unity.recorder": "4.0.2",
     "com.unity.render-pipelines.universal": "14.0.8",
